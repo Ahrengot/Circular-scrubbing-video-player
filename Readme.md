@@ -2,9 +2,9 @@
 This is a HTML5/JavaScript/CSS3 conversion of [my old Flash based video player](http://activeden.net/item/video-player-with-circular-scrubbingprogress/130624). 
 
 **It's based around 3 items**:
-- A HTML5 template page for you to work with
-- A jQuery plugin that sets handles all the required event listeners, controls-markup and redering of progress bars, timers etc.
-- A CSS3 theme for you to customize or keep as is.
+1. A HTML5 template page for you to work with
+2. A jQuery plugin that sets handles all the required event listeners, controls-markup and redering of progress bars, timers etc.
+3. A CSS3 theme for you to customize or keep as is.
 
 ## The design
 My aim is a miminal user iterface that works well within a wide variety of designs without colliding with the existing aesthetics in your projects. Still this will have more of an egde than just throwing in a standard Vimeo/YouTube/Whatever video player.
