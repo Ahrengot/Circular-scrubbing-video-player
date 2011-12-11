@@ -3,9 +3,9 @@ This is a HTML5/JavaScript/CSS3 conversion of [my old Flash based video player](
 
 **It's based around 3 items**:
 
-1. A HTML5 template page for you to work with
+1. A HTML template page for you to work with
 2. A jQuery plugin that handles all the event listeners and rendering of controls-markup (Play/pause button, progress bar, timers etc).
-3. A CSS3 theme for you to customize or keep as is.
+3. A CSS theme for you to customize or keep as is.
 
 ## The design
 My aim is a miminal user iterface that works well within a wide variety of designs without colliding with the existing aesthetics in your projects. Still this will have more of an egde than just throwing in a standard Vimeo/YouTube/Whatever video player.
