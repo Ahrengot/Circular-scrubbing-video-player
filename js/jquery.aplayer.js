@@ -16,12 +16,12 @@
 			var $video_wrap = $('<div></div>').addClass('a-video-player').addClass(options.theme).addClass(options.childtheme);
 			
 			//controls wraper
-			var html = '<div class="a-video-controls">';
-			html += '<a class="a-video-play" title="Play/Pause"></a>';
-			html += '<div class="a-video-seek"></div>';
-			html += '<div class="a-video-timer">00:00</div>';
-			html += '<div class="a-volume-box">';
-			html += '<a class="a-mute-button" title="Mute/Unmute"></a>';
+			var html = '<div class="video-controls">';
+			html += '<a class="play-pause" title="Play/Pause">Play/Pause</a>';
+			html += '<div class="seek">Seek</div>';
+			html += '<div class="timer">00:00</div>';
+			html += '<div class="volume-box">';
+			html += '<a class="mute-unmute" title="Mute/Unmute">Mute/Unmute</a>';
 			html += '</div>';
 			html += '</div>';
 			
@@ -34,46 +34,52 @@
 			
 			// Cache video controls for later use
 			var $container = $video.parent('.a-video-player');
-			var $controls = $('.a-video-controls', $container);
-			var $play_btn = $('.a-video-play', $container);
-			var $video_seek = $('.a-video-seek', $container);
-			var $video_timer = $('.a-video-timer', $container);
-			var $volume = $('.a-volume-slider', $container);
-			var $mute_btn = $('.a-mute-button', $container);
+			var $controls = $('.video-controls', $container);
+			var $play_btn = $('.play-pause', $container);
+			var $video_seek = $('.seek', $container);
+			var $video_timer = $('.timer', $container);
+			var $mute_btn = $('.mute-unmute', $container);
 			
 			$controls.hide();
 			
 			// Hook up event listeners to the controls
-			$play_btn.click(aPlay);
+			$play_btn.click(function() {
+				console.log('Play/pause button clicked!');
+				aPlay();
+			});
 			
-			$video.click(aPlay);
+			$video.click(function() {
+				console.log('Video element clicked!');
+				aPlay();
+			});
 			
-			$mute_btn.click(aMute);
+			$mute_btn.click(function() {
+				console.log('Mute/unmute button clicked');
+				aMute();
+			});
 			
 			// TODO: Refactor this into something like $el.bind('something', stateChanged) and handle all cases in the stateChanged method.
 			$video.bind('play', function() {
 				console.log('play event fired');
-				$play_btn.addClass('a-paused-button');
+				$play_btn.addClass('paused');
 			});
 			
 			$video.bind('pause', function() {
 				console.log('pause event fired');
-				$play_btn.removeClass('a-paused-button');
+				$play_btn.removeClass('paused');
 			});
 			
 			$video.bind('ended', function() {
 				console.log('ended event fired');
-				$play_btn.removeClass('a-paused-button');
+				$play_btn.removeClass('paused');
 			});
 			
-			$video.bind('timeupdate', function() {
-				updateSeek();
-			});
+			$video.bind('timeupdate', updateSeek);
 			
 			// Playback logic
 			var aPlay = function() {
 				console.log('aPlay()');
-				($video.attr('paused'))? $video[0].play() : $video[0].pause();
+				($video[0].paused)? $video[0].play() : $video[0].pause();
 			}
 			
 			var aSeek = function() {
@@ -94,12 +100,12 @@
 			
 			var aMute = function() {
 				console.log('aMute()');
-				if($video.attr('muted')==true) {
-					$video.attr('muted', false);
-					$volume_btn.removeClass('a-volume-mute');					
+				if($video[0].muted) {
+					$video[0].muted = false;
+					$mute_btn.removeClass('muted');					
 				} else {
-					$video.attr('muted', true);
-					$volume_btn.addClass('a-volume-mute');
+					$video[0].muted = true;
+					$mute_btn.addClass('muted');
 				};
 			}
 			
