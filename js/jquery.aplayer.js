@@ -2,8 +2,7 @@
 (function($) {
 	$.fn.aPlayer = function(options) {
 		var defaults = {
-			theme: 'ahrengot',
-			childtheme: ''
+			theme: 'ahrengot'
 		}
 		
 		var options = $.extend(defaults, options);
@@ -13,10 +12,10 @@
 			var $video = $(this);
 			
 			//main wrapper
-			var $video_wrap = $('<div></div>').addClass('a-video-player').addClass(options.theme).addClass(options.childtheme);
+			var $video_wrap = $('<div class="a-video-player paused ended"></div>').addClass(options.theme);
 			
 			//controls wraper
-			var html = '<div class="video-controls">';
+			var html = '<div class="controls">';
 			html += '<a class="play-pause" title="Play/Pause">Play/Pause</a>';
 			html += '<div class="seek">Seek</div>';
 			html += '<div class="timer">00:00</div>';
@@ -61,17 +60,20 @@
 			// TODO: Refactor this into something like $el.bind('something', stateChanged) and handle all cases in the stateChanged method.
 			$video.bind('play', function() {
 				console.log('play event fired');
-				$play_btn.addClass('paused');
+				$play_btn.removeClass('paused');
+				$container.removeClass('paused ended');
 			});
 			
 			$video.bind('pause', function() {
 				console.log('pause event fired');
-				$play_btn.removeClass('paused');
+				$play_btn.addClass('paused');
+				$container.addClass('paused');
 			});
 			
 			$video.bind('ended', function() {
 				console.log('ended event fired');
-				$play_btn.removeClass('paused');
+				$play_btn.addClass('paused');
+				$container.addClass('paused ended');
 			});
 			
 			$video.bind('timeupdate', updateSeek);
