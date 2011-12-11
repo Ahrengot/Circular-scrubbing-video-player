@@ -52,19 +52,23 @@
 			
 			// TODO: Refactor this into something like $el.bind('something', stateChanged) and handle all cases in the stateChanged method.
 			$video.bind('play', function() {
+				console.log('play event fired');
 				$play_btn.addClass('a-paused-button');
 			});
 			
 			$video.bind('pause', function() {
+				console.log('pause event fired');
 				$play_btn.removeClass('a-paused-button');
 			});
 			
 			$video.bind('ended', function() {
+				console.log('ended event fired');
 				$play_btn.removeClass('a-paused-button');
-			}
-			);
+			});
 			
-			$video.bind('timeupdate', updateSeek);
+			$video.bind('timeupdate', function() {
+				updateSeek();
+			});
 			
 			// Playback logic
 			var aPlay = function() {
@@ -76,10 +80,12 @@
 				console.log('aSeek() - $video.readyState: ' + $video[0].readyState);
 				// We need the video to be in the readyState before we can read it's duration.
 				if($video[0].readyState > 0) {
-					var duration = $video.attr('duration');
+					var duration = $video[0].duration;
 					console.log('Video is ' + duration + ' seconds long');
+					$video_timer.text(formatTime(duration));
+					
 					// TODO: Implement circular seek/progress logic here
-					$video_controls.show();					
+					$video_controls.show();			
 				} else {
 					setTimeout(aSeek, 150);
 				}
@@ -99,9 +105,10 @@
 			
 			// Playback helper methods
 			var updateSeek = function() {
-				var currTime = $video.attr('currentTime');
+				console.log('updateSeek()');
+				var timeLeft = $video[0].duration - $video[0].currentTime;
 				// if(!seeksliding) $video_seek.slider('value', currenttime);
-				$video_timer.text(formatTime(currenttime));							
+				$video_timer.text(formatTime(timeLeft));							
 			}
 		
 			var formatTime = function(seconds){
