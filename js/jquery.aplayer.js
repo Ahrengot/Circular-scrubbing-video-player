@@ -73,17 +73,18 @@
 			}
 			
 			var aSeek = function() {
-				console.log('aSeek()');
+				console.log('aSeek() - $video.readyState: ' + $video[0].readyState);
 				// We need the video to be in the readyState before we can read it's duration.
-				if($video.attr('readyState')) {
+				if($video[0].readyState > 0) {
 					var duration = $video.attr('duration');
 					console.log('Video is ' + duration + ' seconds long');
 					// TODO: Implement circular seek/progress logic here
 					$video_controls.show();					
 				} else {
-					setTimeout(createSeek, 150);
+					setTimeout(aSeek, 150);
 				}
 			}
+			aSeek();
 			
 			var aMute = function() {
 				console.log('aMute()');
