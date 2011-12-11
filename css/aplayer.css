@@ -1,0 +1,40 @@
+.a-video-player {  }
+
+.a-video-player .play-pause,
+.a-video-player .progress,
+.a-video-player .seek,
+.a-video-player .mute-unmute {
+	display: block;
+	float: left;
+	cursor: pointer;
+	
+	width: 30px; height: 20px;
+	background: rgba(255, 128, 128, 0.85);
+	
+	-moz-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+	-webkit-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out; 
+}
+
+.a-video-player .play-pause {
+	opacity: 0.8;
+}
+
+.a-video-player .play-pause.paused {
+	background: blue;
+}
+
+.a-video-player .mute-unmute {
+	opacity: 0.8;
+}
+
+.a-video-player .play-pause:hover,
+.a-video-player .mute-unmute:hover {	
+	opacity: 1;
+}
+
+.a-video-player .volume-box {	
+	
+}
