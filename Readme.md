@@ -2,6 +2,7 @@
 This is a HTML5/JavaScript/CSS3 conversion of [my old Flash based video player](http://activeden.net/item/video-player-with-circular-scrubbingprogress/130624). 
 
 **It's based around 3 items**:
+
 1. A HTML5 template page for you to work with
 2. A jQuery plugin that sets handles all the required event listeners, controls-markup and redering of progress bars, timers etc.
 3. A CSS3 theme for you to customize or keep as is.
