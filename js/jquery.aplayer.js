@@ -16,7 +16,7 @@
 			
 			//controls wraper
 			var html = '<div class="controls">';
-			html += '<a class="play-pause" title="Play/Pause">Play/Pause</a>';
+			html += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
 			html += '<div class="seek">Seek</div>';
 			html += '<div class="timer">00:00</div>';
 			html += '<div class="volume-box">';
@@ -44,11 +44,6 @@
 			// Hook up event listeners to the controls
 			$play_btn.click(function() {
 				console.log('Play/pause button clicked!');
-				aPlay();
-			});
-			
-			$video.click(function() {
-				console.log('Video element clicked!');
 				aPlay();
 			});
 			

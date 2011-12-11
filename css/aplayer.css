@@ -11,21 +11,25 @@
 	
 	opacity: 0;
 	
-	-moz-transition: opacity 0.2s ease-in-out;
-    -ms-transition: opacity 0.2s ease-in-out;
-    -o-transition: opacity 0.2s ease-in-out;
-	-webkit-transition: opacity 0.2s ease-in-out;
-	transition: opacity 0.2s ease-in-out;
+	-moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+	-webkit-transition: all 0.3s ease-out;
+	transition: all 0.3s ease-out;
 }
 
-.a-video-player.ended .controls { 
-	width: 74px; height: 74px;
-	margin: -37px 0 0 -37px;
-	border-radius: 74px;
-}
+.a-video-player.ended .controls { width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 74px; }
 
+/* When the player is in the paused state don't fade away the controls or the video player looks like an image */
 .a-video-player.paused .controls, .a-video-player:hover .controls { opacity: 1; }
 
+/* Hide everything but the play button when the video player is in its 'ended' state */
+.a-video-player.ended .controls *:not(.play-pause) {  display: none; }
+
+/* When the user hovers over the progress bar switch out the play/pause button with the time readout */
+.a-video-player .controls .seek:hover { /* Add styles */ }
+
+/* Basic styles for all buttons */
 .a-video-player .play-pause,
 .a-video-player .progress,
 .a-video-player .seek,
@@ -38,32 +42,32 @@
 	background: rgba(255, 128, 128, 0.85);
 	text-indent: -9999px;
 	
-	-moz-transition: all 0.2s ease-in-out;
-    -ms-transition: all 0.2s ease-in-out;
-    -o-transition: all 0.2s ease-in-out;
-	-webkit-transition: all 0.2s ease-in-out;
-	transition: all 0.2s ease-in-out; 
+	-moz-transition: opacity 0.2s ease-in-out;
+    -ms-transition: opacity 0.2s ease-in-out;
+    -o-transition: opacity 0.2s ease-in-out;
+	-webkit-transition: opacity 0.2s ease-in-out;
+	transition: opacity 0.2s ease-in-out; 
 }
 
-.a-video-player .play-pause {
+/* Individual button styles */
+.a-video-player .play-pause { 
+	position: absolute;
+	top: 50%; left: 50%;
+	width: 31px; height: 39px;
+	margin: -19px 0 0 -15px;
+	
+	background: url('../img/controls.png') no-repeat -38px 0;
 	opacity: 0.8;
 }
 
-.a-video-player .play-pause.paused,
-.a-video-player .mute-unmute.muted {
-	background: blue;
-}
+.a-video-player .play-pause.paused { background-position: 0 0; width: 30px; height: 39px; margin-left: -12px; }
 
-.a-video-player .mute-unmute {
-	opacity: 0.8;
-	display: none; /* Implement this later */
-}
+.a-video-player .mute-unmute { opacity: 0.8; display: none; /* Implement this later */ }
 
-.a-video-player .play-pause:hover,
-.a-video-player .mute-unmute:hover {	
-	opacity: 1;
-}
+.a-video-player .play-pause:hover, .a-video-player .mute-unmute:hover { opacity: 1; }
 
 .a-video-player .seek { display: none; /* Implement this later */ }
 
 .a-video-player .volume-box {	}
+
+.a-video-player .timer { display: none; }
