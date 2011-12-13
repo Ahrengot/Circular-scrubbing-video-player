@@ -31,13 +31,14 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 	
 	function init() {
 		self.progress = 0;
+		self.lastProgress = self.progress;
 		self.isScrubbing = false;
 		drawProgBar();
 	}
 	
 	function drawProgBar() {
 		progressBar = paper.path()
-						.attr({stroke: "rgb(255,255,255)", "stroke-width": strokeWidth, arc: [0, 100, radius]})
+						.attr({stroke: "rgb(255,255,255)", "stroke-width": strokeWidth, cursor: 'pointer', arc: [0, 100, radius]})
 						.click(handleProgBarClick)
 						.drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
 	}
@@ -47,24 +48,22 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 		console.log('clicked progress bar');
 	}
 	
-	function handleProgBarMove(startX, startY, pageX, pageY) {
-		var centerX = 0,
-			centerY = 0,
-			angle 	= Raphael.angle(centerX, centerY, pageX, pageY);
+	function handleProgBarMove(dragLenghtX, dragLenghtY, pageX, pageY, event) {
+		var paperW 			= paper.width,
+			paperH 			= paper.height,
+			paperAbsCenter	= $(paper.canvas).offset(),
+			paperAbsX		= paperAbsCenter.left,
+			paperAbsY		= paperAbsCenter.top + (paperW >> 1),
+			angle 			= Raphael.angle(paperAbsX, paperAbsY, event.pageX, event.pageY);
+	
+		// Angle 0 value is offset by += 90. Fix that.
+		angle -= 90;
+		if (angle < 0) angle += 360;
 		
-		/*angle = (angle * -1) + 90;
-		if (angle < 0) angle += 360;*/
-		
-		console.log('Angle: ' + angle);
-		
-		/*if (angle < 0) {
-			console.log('old angle was: ' + angle + ' – Correcting it to: ' + (360 - angle));
-			angle = 360 - angle;
-		}*/
-			
+		// Convert 0-360° value to 0-100% value.
 		var perc = (angle / 360) * 100;
-		
-		self.setProgress(perc, 20);
+		 
+		self.setProgress(perc, 0, 'linear');
 	}
 	
 	function handleProgBarDown() {
@@ -81,7 +80,16 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 		if (duration == undefined) duration = 400;
 		
 		self.progress = value;
-		progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
+		
+		if (self.progress != self.lastProgress) {
+			if (duration == 0) {
+				console.log('Progress updated: ' + self.progress);
+				progressBar.attr({arc: [self.progress, 100, radius]});
+			} else {
+				progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
+			}
+			self.lastProgress = self.progress;
+		}
 		
 		setProgressCallback(value);
 	}

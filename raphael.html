@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Raphaël · Polar Clock</title>
+        <title>Circular progress with SVG</title>
         
         <style type="text/css">
         	body { background: url(wood_pattern.png) repeat; }
@@ -24,11 +24,13 @@
 			#holder:hover { box-shadow: 0 0 25px rgba(0,0,0,0.8); }
         </style>
         
+        <script src="js/libs/jquery-1.7.1.min.js"></script>
         <script src="raphael-min.js"></script>
         <script src="js/circularprogress.js"></script>
         
         <script type="text/javascript">
         	window.onload = function () {
+        		// Implement a secondary (invisible) progress bar with a wider radius that acts as a hitbox for this progress bar.
                 var circularProgress = new CircularProgress(45, 4, handleProgUpdate);
                 
                 function handleProgUpdate() {
@@ -42,7 +44,7 @@
 	                	
 	                	circularProgress.setProgress(circularProgress.progress);
                 	}
-                	setTimeout(arguments.callee, 300);
+                	setTimeout(arguments.callee, 200);
                 })();
             };
         </script>
