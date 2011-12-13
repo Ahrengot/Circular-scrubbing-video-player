@@ -44,6 +44,7 @@
 			// Hook up event listeners to the controls
 			$play_btn.click(function() {
 				console.log('Play/pause button clicked!');
+				// fullscreen();
 				aPlay();
 			});
 			
@@ -120,6 +121,25 @@
 				var seconds = Math.floor(seconds - (minutes * 60)) < 10 ? "0" + Math.floor(seconds - (minutes * 60)) : Math.floor(seconds-(minutes * 60));
 				
 				return minutes + ":" + seconds;
+			}
+			
+			// Other methods
+			
+			var fullscreen = function() {
+				if ($video[0].requestFullScreen) {
+					$video[0].requestFullScreen();
+					resizePlayer();
+				} else if ($video[0].mozRequestFullScreen) {
+					$video[0].mozRequestFullScreen();
+					resizePlayer();
+				} else if ($video[0].webkitRequestFullScreen) {
+					$video[0].webkitRequestFullScreen();
+					resizePlayer();
+				}
+			}
+			
+			var resizePlayer = function(w, h) {
+				$video.css({'width': '100%', 'height': '100%'});
 			}
 		});	
 	}
