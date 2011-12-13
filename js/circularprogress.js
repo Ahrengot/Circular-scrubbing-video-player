@@ -21,7 +21,7 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 	    // +(expression) converts true/false to 1/0 
 	    var isMoreThan180 = +(angle > 180);
 	    
-	    // Make bar appear as 100% complete by setting it to 99% – Otherwise it's removed
+	    // If total == value: Make bar appear as 100% complete by setting it to 99.99% – Otherwise it'll reset to 0
 	    if (total == value) x = halfW - 0.01, y = halfH - radius;
 	    
 	    path.push(["A", radius, radius, 0, isMoreThan180, 1, x, y]);
@@ -54,24 +54,38 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 			paperAbsCenter	= $(paper.canvas).offset(),
 			paperAbsX		= paperAbsCenter.left,
 			paperAbsY		= paperAbsCenter.top + (paperW >> 1),
-			angle 			= Raphael.angle(paperAbsX, paperAbsY, event.pageX, event.pageY);
+			angle 			= 0;
+			
+		angle = calculateAngle(paperAbsX, paperAbsY, event.pageX, event.pageY);
 	
-		// Angle 0 value is offset by += 90. Fix that.
-		angle -= 90;
-		if (angle < 0) angle += 360;
+		console.log('New angle: ' + angle);
 		
 		// Convert 0-360° value to 0-100% value.
 		var perc = (angle / 360) * 100;
-		 
+		
 		self.setProgress(perc, 0, 'linear');
 	}
 	
-	function handleProgBarDown() {
-		self.isScrubbing = true;
-	}
+	function handleProgBarDown() { self.isScrubbing = true; }
 	
-	function handleProgBarUp() {
-		self.isScrubbing = false;
+	function handleProgBarUp() { self.isScrubbing = false; }
+	
+	function calculateAngle(x1, y1, x2, y2) {
+		var radiansToDegrees 	= Math.PI / 180,
+			degreesToRadians 	= 180 / Math.PI,
+			xDiff 				= x2 - x1,
+			yDiff 				= (y2 - y1) * -1,
+			angleInRadians 		= Math.atan(yDiff / xDiff),
+			angle 				= angleInRadians / radiansToDegrees;
+		
+		
+		if (xDiff < 0) angle += 180;
+		if (xDiff > 0 && yDiff < 0) angle += 360;
+		
+		angle = (angle * -1) + 90;
+		if (angle < 0) angle += 360;
+		
+		return angle;
 	}
 	
 	// Public methods
@@ -83,7 +97,7 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 		
 		if (self.progress != self.lastProgress) {
 			if (duration == 0) {
-				console.log('Progress updated: ' + self.progress);
+				//console.log('Progress updated: ' + self.progress);
 				progressBar.attr({arc: [self.progress, 100, radius]});
 			} else {
 				progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
