@@ -42,11 +42,11 @@
 	background: rgba(255, 128, 128, 0.85);
 	text-indent: -9999px;
 	
-	-moz-transition: opacity 0.2s ease-in-out;
-    -ms-transition: opacity 0.2s ease-in-out;
-    -o-transition: opacity 0.2s ease-in-out;
-	-webkit-transition: opacity 0.2s ease-in-out;
-	transition: opacity 0.2s ease-in-out; 
+	-moz-transition: opacity 0.15s ease-out;
+    -ms-transition: opacity 0.15s ease-out;
+    -o-transition: opacity 0.15s ease-out;
+	-webkit-transition: opacity 0.15s ease-out;
+	transition: opacity 0.15s ease-out; 
 }
 
 /* Individual button styles */

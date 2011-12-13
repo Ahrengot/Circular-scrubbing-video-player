@@ -39,7 +39,7 @@
 			var $video_timer = $('.timer', $container);
 			var $mute_btn = $('.mute-unmute', $container);
 			
-			$controls.hide();
+			$controls.fadeOut(0);
 			
 			// Hook up event listeners to the controls
 			$play_btn.click(function() {
@@ -52,7 +52,7 @@
 				aMute();
 			});
 			
-			// TODO: Refactor this into something like $el.bind('something', stateChanged) and handle all cases in the stateChanged method.
+			// TODO: Refactor this into something like $el.bind('event', stateChanged) and handle all cases in the stateChanged method.
 			$video.bind('play', function() {
 				console.log('play event fired');
 				$play_btn.removeClass('paused');
@@ -88,7 +88,7 @@
 					$video_timer.text(formatTime(duration));
 					
 					// TODO: Implement circular seek/progress logic here
-					$video_controls.show();			
+					$video_controls.fadeIn(350);			
 				} else {
 					setTimeout(aSeek, 150);
 				}
