@@ -43,9 +43,7 @@
 			$controls.fadeOut(0);
 			
 			// Progress bars – The larger stroke of progHitbox makes mouse-interaction easier.
-			// (containerEl, radius, strokeWidth, strokeColor, customStyles, enableDragging, newProgressCallback)
 			var playbackProg = new CircularProgress($progress.attr('id'), 40, 4, 'white', null, true, handleProgUpdate);
-			//bufferProg.setProgress(80, 1000);
 			
 			// Hook up playback control events
 			$play_btn.click(aPlay);
@@ -55,9 +53,8 @@
 			// Hook up media events
 			$video.bind('play pause ended', handleVideoState);
 			$video.bind('timeupdate', updateProg);
-			$video.bind('')
+			$video.bind('');
 			
-			playbackProg.setProgress(65, 100)
 			
 			// Handle media events
 			function handleVideoState(e) {

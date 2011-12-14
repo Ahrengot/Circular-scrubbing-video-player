@@ -24,7 +24,7 @@
 .a-video-player.paused .controls, .a-video-player:hover .controls { opacity: 1; }
 
 /* Hide everything but the play button when the video player is in its 'ended' state */
-.a-video-player.ended .controls *:not(.play-pause) {  display: none; }
+.a-video-player.ended .controls *:not(.play-pause) { display: none; }
 
 /* When the user hovers over the progress bar switch out the play/pause button with the time readout */
 .a-video-player .controls .progress:hover { /* Add styles */ }
@@ -58,7 +58,11 @@
 	opacity: 0.8;
 }
 
-.a-video-player .play-pause.paused { background-position: 0 0; width: 30px; height: 39px; margin-left: -12px; }
+.a-video-player .play-pause.paused { 
+	background-position: 0 0; 
+	width: 30px; height: 39px; 
+	margin-left: -12px; 
+}
 
 .a-video-player .mute-unmute { opacity: 0.8; display: none; /* Implement this later */ }
 
@@ -69,6 +73,26 @@
 	z-index: 9998; 
 	width: 84px; height: 84px; 
 	padding: 4px;
+}
+
+.a-video-player .progress:before {
+	position: absolute;
+	top: 4px; left: 4px;
+	width: 84px; height: 84px;
+	content: '';
+	background: transparent;
+	box-shadow: inset 0 1px 0 black, 0 1px 0 rgba(255,255,255,0.2);
+	border-radius: 84px;
+}
+
+.a-video-player .progress:after {
+	position: absolute;
+	top: 8px; left: 8px;
+	width: 76px; height: 76px;
+	content: '';
+	background: transparent;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 0 black;
+	border-radius: 76px;
 }
 
 .a-video-player .volume-box {	}
