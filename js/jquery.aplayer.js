@@ -9,7 +9,8 @@
 		
 		// iterate each matched <video> element
 		return this.each(function() {
-			var $video = $(this);
+			var $video = $(this),
+				unique = Math.round(Math.random()*(+new Date)).toString();
 			
 			//main wrapper
 			var $video_wrap = $('<div class="a-video-player paused ended"></div>').addClass(options.theme);
@@ -17,11 +18,10 @@
 			//controls wraper
 			var html = '<div class="controls">';
 			html += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
-			html += '<div class="seek">Seek</div>';
+			html += '<div id="prog-' + unique + '" class="progress"></div>';
 			html += '<div class="timer">00:00</div>';
-			html += '<div class="volume-box">';
-			html += '<a class="mute-unmute" title="Mute/Unmute">Mute/Unmute</a>';
-			html += '</div>';
+			html += '<div class="mute-unmute"></div>';
+			html += '<div class="fullscreen"></div>';
 			html += '</div>';
 			
 			var $video_controls = $(html);						
@@ -35,87 +35,95 @@
 			var $container = $video.parent('.a-video-player');
 			var $controls = $('.video-controls', $container);
 			var $play_btn = $('.play-pause', $container);
-			var $video_seek = $('.seek', $container);
+			var $progress = $('#prog-' + unique, $container);
 			var $video_timer = $('.timer', $container);
 			var $mute_btn = $('.mute-unmute', $container);
+			var $fullscreen_btn = $('.fullscreen', $container);
 			
 			$controls.fadeOut(0);
 			
-			// Hook up event listeners to the controls
-			$play_btn.click(function() {
-				console.log('Play/pause button clicked!');
-				// fullscreen();
-				aPlay();
-			});
+			// Progress bars – The larger stroke of progHitbox makes mouse-interaction easier.
+			// (containerEl, radius, strokeWidth, strokeColor, customStyles, enableDragging, newProgressCallback)
+			var playbackProg = new CircularProgress($progress.attr('id'), 40, 4, 'white', null, true, handleProgUpdate);
+			//bufferProg.setProgress(80, 1000);
 			
-			$mute_btn.click(function() {
-				console.log('Mute/unmute button clicked');
-				aMute();
-			});
+			// Hook up playback control events
+			$play_btn.click(aPlay);
+			$mute_btn.click(aMute);
+			$fullscreen_btn.click(fullscreen);
 			
-			// TODO: Refactor this into something like $el.bind('event', stateChanged) and handle all cases in the stateChanged method.
-			$video.bind('play', function() {
-				console.log('play event fired');
-				$play_btn.removeClass('paused');
-				$container.removeClass('paused ended');
-			});
+			// Hook up media events
+			$video.bind('play pause ended', handleVideoState);
+			$video.bind('timeupdate', updateProg);
+			$video.bind('')
 			
-			$video.bind('pause', function() {
-				console.log('pause event fired');
-				$play_btn.addClass('paused');
-				$container.addClass('paused');
-			});
+			playbackProg.setProgress(65, 100)
 			
-			$video.bind('ended', function() {
-				console.log('ended event fired');
-				$play_btn.addClass('paused');
-				$container.addClass('paused ended');
-			});
+			// Handle media events
+			function handleVideoState(e) {
+				switch(e.type) {
+					case 'play':
+						console.log('play event fired');
+						$play_btn.removeClass('paused');
+						$container.removeClass('paused ended');
+						break;
+					case 'pause':
+						console.log('pause event fired');
+						$play_btn.addClass('paused');
+						$container.addClass('paused');
+						break;
+					case 'ended':
+						console.log('ended event fired');
+						$play_btn.addClass('paused');
+						$container.addClass('paused ended');
+						playbackProg.setProgress(0, 0);
+						break;
+				}
+			}
 			
-			$video.bind('timeupdate', updateSeek);
+			function updateProg() {
+				var timeLeft 	= $video[0].duration - $video[0].currentTime,
+					prog		= ($video[0].currentTime / $video[0].duration) * 100;
+				
+				if (!playbackProg.isScrubbing) playbackProg.setProgress(prog, 100);
+				
+				$video_timer.text(formatTime(timeLeft));							
+			}
+			
+			function handleProgUpdate(prog) {
+				if (playbackProg.isScrubbing && prog < 100) {
+					$video[0].currentTime = $video[0].duration * (prog / 100);
+				}
+			}
 			
 			// Playback logic
-			var aPlay = function() {
-				console.log('aPlay()');
+			function aPlay() {
 				($video[0].paused)? $video[0].play() : $video[0].pause();
 			}
 			
-			var aSeek = function() {
-				console.log('aSeek() - $video.readyState: ' + $video[0].readyState);
+			(function spawnControls() {
 				// We need the video to be in the readyState before we can read it's duration.
 				if($video[0].readyState > 0) {
 					var duration = $video[0].duration;
-					console.log('Video is ' + duration + ' seconds long');
 					$video_timer.text(formatTime(duration));
+					
+					// Force resize event so CircularProgress instances can find their position in the window
 					
 					// TODO: Implement circular seek/progress logic here
 					$video_controls.fadeIn(350);			
 				} else {
-					setTimeout(aSeek, 150);
+					setTimeout(arguments.callee, 150);
 				}
-			}
-			aSeek();
+			})();
 			
-			var aMute = function() {
-				console.log('aMute()');
-				if($video[0].muted) {
-					$video[0].muted = false;
-					$mute_btn.removeClass('muted');					
-				} else {
-					$video[0].muted = true;
-					$mute_btn.addClass('muted');
-				};
+			function aMute() {
+				($video[0].muted)? $video[0].muted = false : $video[0].muted = true;
+				$mute_btn.toggleClass('muted', $video[0].muted);
 			}
 			
 			// Playback helper methods
-			var updateSeek = function() {
-				console.log('updateSeek()');
-				var timeLeft = $video[0].duration - $video[0].currentTime;
-				// if(!seeksliding) $video_seek.slider('value', currenttime);
-				$video_timer.text(formatTime(timeLeft));							
-			}
-		
-			var formatTime = function(seconds){
+			
+			function formatTime(seconds){
 				// TODO: Refactor this section to make it more readable.
 				var minutes = Math.floor(seconds / 60) < 10 ? "0" + Math.floor(seconds / 60) : Math.floor(seconds / 60);
 				var seconds = Math.floor(seconds - (minutes * 60)) < 10 ? "0" + Math.floor(seconds - (minutes * 60)) : Math.floor(seconds-(minutes * 60));
@@ -125,21 +133,23 @@
 			
 			// Other methods
 			
-			var fullscreen = function() {
+			function fullscreen() {
 				if ($video[0].requestFullScreen) {
 					$video[0].requestFullScreen();
-					resizePlayer();
+					resizePlayer('100%', '100%');
 				} else if ($video[0].mozRequestFullScreen) {
 					$video[0].mozRequestFullScreen();
-					resizePlayer();
+					resizePlayer('100%', '100%');
 				} else if ($video[0].webkitRequestFullScreen) {
 					$video[0].webkitRequestFullScreen();
-					resizePlayer();
+					resizePlayer('100%', '100%');
+				} else {
+					// Browser doesn't support fullscreen...
 				}
 			}
 			
-			var resizePlayer = function(w, h) {
-				$video.css({'width': '100%', 'height': '100%'});
+			function resizePlayer(w, h) {
+				$video.css({'width': w, 'height': h});
 			}
 		});	
 	}

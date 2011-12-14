@@ -27,16 +27,14 @@
 .a-video-player.ended .controls *:not(.play-pause) {  display: none; }
 
 /* When the user hovers over the progress bar switch out the play/pause button with the time readout */
-.a-video-player .controls .seek:hover { /* Add styles */ }
+.a-video-player .controls .progress:hover { /* Add styles */ }
 
 /* Basic styles for all buttons */
-.a-video-player .play-pause,
-.a-video-player .progress,
-.a-video-player .seek,
-.a-video-player .mute-unmute {
+.a-video-player .play-pause {
 	display: block;
 	float: left;
 	cursor: pointer;
+	z-index: 9999;
 	
 	width: 30px; height: 20px;
 	background: rgba(255, 128, 128, 0.85);
@@ -66,7 +64,12 @@
 
 .a-video-player .play-pause:hover, .a-video-player .mute-unmute:hover { opacity: 1; }
 
-.a-video-player .seek { display: none; /* Implement this later */ }
+.a-video-player .progress { 
+	position: relative; 
+	z-index: 9998; 
+	width: 84px; height: 84px; 
+	padding: 4px;
+}
 
 .a-video-player .volume-box {	}
 

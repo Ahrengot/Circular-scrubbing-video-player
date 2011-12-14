@@ -1,4 +1,4 @@
-window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor, setProgressCallback) {
+window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor, customStyles, enableDragging, newProgressCallback) {
 	// Internal properties
 	var self 				= this,
 		radius 				= radius,
@@ -35,10 +35,14 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 	}
 	
 	function drawProgBar() {
-		progressBar = paper.path()
-						.attr({stroke: strokeColor, "stroke-width": strokeWidth, cursor: 'pointer', arc: [0, 100, radius]})
-						.click(handleProgBarClick)
-						.drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
+		progressBar = paper.path().attr({stroke: strokeColor, "stroke-width": strokeWidth, arc: [0, 100, radius]})
+		if (enableDragging) {
+			progressBar.attr({cursor: 'pointer'}).drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
+		}
+		
+		if (customStyles) {
+			progressBar.attr(customStyles);
+		}
 	}
 	
 	// Event Handlers
@@ -51,10 +55,6 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		paperCenterY = containerPos.top + (h >> 1) + parseInt(paddingTop);
 	}
 	
-	function handleProgBarClick() {
-		
-	}
-	
 	function handleProgBarMove(dragLenghtX, dragLenghtY, pageX, pageY, event) {
 		var angle = calculateAngle(paperCenterX, paperCenterY, event.pageX, event.pageY);
 		angle = Math.round(angle);
@@ -65,7 +65,7 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		self.setProgress(perc, 100);
 	}
 	
-	function handleProgBarDown() { self.isScrubbing = true; }
+	function handleProgBarDown() { self.isScrubbing = true; $(window).resize(); }
 	
 	function handleProgBarUp() { self.isScrubbing = false; }
 	
@@ -83,6 +83,8 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		
 		angle = (angle * -1) + 90;
 		if (angle < 0) angle += 360;
+		
+		if (angle > 359.99) angle = 359.99;
 		
 		return angle;
 	}
@@ -103,7 +105,7 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 			self.lastProgress = self.progress;
 		}
 		
-		setProgressCallback(value);
+		if (newProgressCallback != null) newProgressCallback(value);
 	}
 	
 	self.getProgress = function() { return self.progress; }
