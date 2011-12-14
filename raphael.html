@@ -31,7 +31,7 @@
         <script type="text/javascript">
         	window.onload = function () {
         		// Implement a secondary (invisible) progress bar with a wider radius that acts as a hitbox for this progress bar.
-                var circularProgress = new CircularProgress(45, 4, handleProgUpdate);
+                var circularProgress = new CircularProgress('holder', 45, 4, 'rgb(255,255,255)', handleProgUpdate);
                 
                 function handleProgUpdate() {
                 	// console.log('Progress updated: ' + circularProgress.getProgress());

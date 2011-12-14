@@ -1,30 +1,25 @@
-window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
+window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor, setProgressCallback) {
 	// Internal properties
 	var self 				= this,
 		radius 				= radius,
-		strokeWidth			= strokewidth,
 		w					= (radius * 2) + strokeWidth,
 		h					= w,
 		halfW				= w >> 1,
 		halfH				= h >> 1,
-		paper 				= Raphael("holder", w, h),
+		paper 				= Raphael(containerEl, w, h),
+		paperCenterX		= 0,
+		paperCenterY		= 0,
+		$container			= $('#' + containerEl),
 		progressBar;
 	
 	// Custom Attribute
 	paper.customAttributes.arc = function (value, total, radius) {
-	    var angle 	= 360 / total * value,
-	        radians	= (90 - angle) * Math.PI / 180,
-	        x 		= halfW + radius * Math.cos(radians),
-	        y 		= halfH - radius * Math.sin(radians),
-	        path 	= [["M", halfW, halfH - radius]];
-	    
-	    // +(expression) converts true/false to 1/0 
-	    var isMoreThan180 = +(angle > 180);
-	    
-	    // If total == value: Make bar appear as 100% complete by setting it to 99.99% – Otherwise it'll reset to 0
-	    if (total == value) x = halfW - 0.01, y = halfH - radius;
-	    
-	    path.push(["A", radius, radius, 0, isMoreThan180, 1, x, y]);
+	    var angle 			= 360 / total * value,
+	        radians			= (90 - angle) * Math.PI / 180,
+	        x 				= halfW + radius * Math.cos(radians),
+	        y 				= halfH - radius * Math.sin(radians),
+	        isMoreThan180 	= +(angle > 180),
+	        path 			= [["M", halfW, halfH - radius], ["A", radius, radius, 0, isMoreThan180, 1, x, y]];
 	    
 	    return {path: path};
 	};
@@ -34,36 +29,40 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 		self.lastProgress = self.progress;
 		self.isScrubbing = false;
 		drawProgBar();
+		
+		$(window).resize(handleResize);
+		$(window).resize();
 	}
 	
 	function drawProgBar() {
 		progressBar = paper.path()
-						.attr({stroke: "rgb(255,255,255)", "stroke-width": strokeWidth, cursor: 'pointer', arc: [0, 100, radius]})
+						.attr({stroke: strokeColor, "stroke-width": strokeWidth, cursor: 'pointer', arc: [0, 100, radius]})
 						.click(handleProgBarClick)
 						.drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
 	}
 	
 	// Event Handlers
+	function handleResize(e) {
+		var containerPos 	= $container.offset(),
+			paddingLeft 	= $container.css('padding-left'),
+			paddingTop		= $container.css('padding-top');
+		
+		paperCenterX = containerPos.left + (w >> 1) + parseInt(paddingLeft);
+		paperCenterY = containerPos.top + (h >> 1) + parseInt(paddingTop);
+	}
+	
 	function handleProgBarClick() {
-		console.log('clicked progress bar');
+		
 	}
 	
 	function handleProgBarMove(dragLenghtX, dragLenghtY, pageX, pageY, event) {
-		var paperW 			= paper.width,
-			paperH 			= paper.height,
-			paperAbsCenter	= $(paper.canvas).offset(),
-			paperAbsX		= paperAbsCenter.left,
-			paperAbsY		= paperAbsCenter.top + (paperW >> 1),
-			angle 			= 0;
-			
-		angle = calculateAngle(paperAbsX, paperAbsY, event.pageX, event.pageY);
-	
-		console.log('New angle: ' + angle);
+		var angle = calculateAngle(paperCenterX, paperCenterY, event.pageX, event.pageY);
+		angle = Math.round(angle);
 		
 		// Convert 0-360° value to 0-100% value.
-		var perc = (angle / 360) * 100;
+		var perc = Math.round((angle / 360) * 100);
 		
-		self.setProgress(perc, 0, 'linear');
+		self.setProgress(perc, 100);
 	}
 	
 	function handleProgBarDown() { self.isScrubbing = true; }
@@ -97,7 +96,6 @@ window.CircularProgress = function(radius, strokewidth, setProgressCallback) {
 		
 		if (self.progress != self.lastProgress) {
 			if (duration == 0) {
-				//console.log('Progress updated: ' + self.progress);
 				progressBar.attr({arc: [self.progress, 100, radius]});
 			} else {
 				progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
