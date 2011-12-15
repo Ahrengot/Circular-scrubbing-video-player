@@ -18,7 +18,10 @@
 			//controls wraper
 			var html = '<div class="controls">';
 			html += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
-			html += '<div id="prog-' + unique + '" class="progress"></div>';
+			html += '<div class="progress">';
+			html += '<div class="playback-prog" id="prog-' + unique + '"></div>';
+			html += '<div class="prog-hitbox" id="prog-hitbox-' + unique + '"></div>';
+			html += '</div>';
 			html += '<div class="timer">00:00</div>';
 			html += '<div class="mute-unmute"></div>';
 			html += '<div class="fullscreen"></div>';
@@ -43,7 +46,8 @@
 			$controls.fadeOut(0);
 			
 			// Progress bars – The larger stroke of progHitbox makes mouse-interaction easier.
-			var playbackProg = new CircularProgress($progress.attr('id'), 40, 4, 'white', null, true, handleProgUpdate);
+			var playbackProg = new CircularProgress('prog-' + unique, 40, 4, 'white');
+			var progHitbox = new CircularProgress('prog-hitbox-' + unique, 40, 20, 'red', {opacity: 0}, true, handleProgUpdate);
 			
 			// Hook up playback control events
 			$play_btn.click(aPlay);
@@ -53,7 +57,7 @@
 			// Hook up media events
 			$video.bind('play pause ended', handleVideoState);
 			$video.bind('timeupdate', updateProg);
-			updateBuffer();
+			//updateBuffer();
 			
 			
 			// Handle media events
@@ -82,7 +86,7 @@
 				var timeLeft 	= $video[0].duration - $video[0].currentTime,
 					prog		= ($video[0].currentTime / $video[0].duration) * 100;
 				
-				if (!playbackProg.isScrubbing) playbackProg.setProgress(prog, 100);
+				if (!progHitbox.isScrubbing) progHitbox.setProgress(prog, 100);
 				
 				$video_timer.text(formatTime(timeLeft));							
 			}
@@ -107,9 +111,10 @@
 			} */
 			
 			function handleProgUpdate(prog) {
-				if (playbackProg.isScrubbing && prog < 100) {
+				if (progHitbox.isScrubbing && prog < 100) {
 					$video[0].currentTime = $video[0].duration * (prog / 100);
 				}
+				playbackProg.setProgress(prog);
 			}
 			
 			// Playback logic
@@ -122,10 +127,6 @@
 				if($video[0].readyState > 0) {
 					var duration = $video[0].duration;
 					$video_timer.text(formatTime(duration));
-					
-					// Force resize event so CircularProgress instances can find their position in the window
-					
-					// TODO: Implement circular seek/progress logic here
 					$video_controls.fadeIn(350);			
 				} else {
 					setTimeout(arguments.callee, 150);
