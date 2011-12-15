@@ -43,6 +43,8 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		if (customStyles) {
 			progressBar.attr(customStyles);
 		}
+		
+		self.el = progressBar.node;
 	}
 	
 	// Event Handlers

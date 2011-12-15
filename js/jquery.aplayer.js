@@ -22,7 +22,7 @@
 			html += '<div class="playback-prog" id="prog-' + unique + '"></div>';
 			html += '<div class="prog-hitbox" id="prog-hitbox-' + unique + '"></div>';
 			html += '</div>';
-			html += '<div class="timer">00:00</div>';
+			html += '<div class="timer"><time>00:00</time><p>Remaining</p></div>';
 			html += '<div class="mute-unmute"></div>';
 			html += '<div class="fullscreen"></div>';
 			html += '</div>';
@@ -39,7 +39,7 @@
 			var $controls = $('.video-controls', $container);
 			var $play_btn = $('.play-pause', $container);
 			var $progress = $('#prog-' + unique, $container);
-			var $video_timer = $('.timer', $container);
+			var $timer = $('.timer', $container);
 			var $mute_btn = $('.mute-unmute', $container);
 			var $fullscreen_btn = $('.fullscreen', $container);
 			
@@ -58,6 +58,16 @@
 			$video.bind('play pause ended', handleVideoState);
 			$video.bind('timeupdate', updateProg);
 			//updateBuffer();
+			
+			$(progHitbox.el).hover(function() {
+				console.log('Fade in timer');
+				$timer.fadeIn(100);
+				$play_btn.fadeOut(200);
+			}, function() {
+				console.log('Fade out timer');
+				$play_btn.fadeIn(100);
+				$timer.fadeOut(200);
+			});
 			
 			
 			// Handle media events
@@ -88,7 +98,7 @@
 				
 				if (!progHitbox.isScrubbing) progHitbox.setProgress(prog, 100);
 				
-				$video_timer.text(formatTime(timeLeft));							
+				$timer.find('time').text(formatTime(timeLeft));							
 			}
 			
 			/* function updateBuffer() {
@@ -126,7 +136,7 @@
 				// We need the video to be in the readyState before we can read it's duration.
 				if($video[0].readyState > 0) {
 					var duration = $video[0].duration;
-					$video_timer.text(formatTime(duration));
+					$timer.find('time').text(formatTime(duration));
 					$video_controls.fadeIn(350);			
 				} else {
 					setTimeout(arguments.callee, 150);
