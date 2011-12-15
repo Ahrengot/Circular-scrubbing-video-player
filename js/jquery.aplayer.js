@@ -59,12 +59,15 @@
 			$video.bind('timeupdate', updateProg);
 			//updateBuffer();
 			
+			var fadeTimer; 
 			$(progHitbox.el).hover(function() {
-				console.log('Fade in timer');
-				$timer.fadeIn(100);
-				$play_btn.fadeOut(200);
+				// Delay fadeIn so time read-out only shows when intended and not when they mouse simply passes over it to reach play/pause.
+				fadeTimer = setTimeout(function() {
+					$timer.fadeIn(100);
+					$play_btn.fadeOut(200);
+				}, 200);
 			}, function() {
-				console.log('Fade out timer');
+				clearTimeout(fadeTimer);
 				$play_btn.fadeIn(100);
 				$timer.fadeOut(200);
 			});
