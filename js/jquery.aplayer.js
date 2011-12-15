@@ -53,7 +53,7 @@
 			// Hook up media events
 			$video.bind('play pause ended', handleVideoState);
 			$video.bind('timeupdate', updateProg);
-			$video.bind('');
+			updateBuffer();
 			
 			
 			// Handle media events
@@ -86,6 +86,25 @@
 				
 				$video_timer.text(formatTime(timeLeft));							
 			}
+			
+			/* function updateBuffer() {
+				var percentBuffered = 0;
+				// FF4+, Chrome, Safari6
+				if ($video[0].buffered && $video[0].buffered.length > 0 && $video[0].buffered.end && $video[0].duration) {
+					percentBuffered = $video[0].buffered.end(0) / $video[0].duration;	
+				} 
+				
+				// FF3.6, Safari5
+				else if ($video[0].bytesTotal != undefined && $video[0].bytesTotal > 0 && $video[0].bufferedBytes != undefined) {
+					percentBuffered = $video[0].bufferedBytes / $video[0].bytesTotal;
+				}
+				
+				// Fallback (probably not neccesary)
+				//else percentBuffered = 1;
+				
+				if (percentBuffered < 1) setTimeout(updateBuffer, 300);
+				console.log('updateBuffer: ' + percentBuffered);
+			} */
 			
 			function handleProgUpdate(prog) {
 				if (playbackProg.isScrubbing && prog < 100) {
