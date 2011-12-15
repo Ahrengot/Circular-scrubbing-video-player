@@ -42,12 +42,15 @@
 			var $timer = $('.timer', $container);
 			var $mute_btn = $('.mute-unmute', $container);
 			var $fullscreen_btn = $('.fullscreen', $container);
+			// TODO: Draw mute and fullscreen buttons with SVG so we don't need any images.
 			
 			$controls.fadeOut(0);
 			
 			// Progress bars – The larger stroke of progHitbox makes mouse-interaction easier.
 			var playbackProg = new CircularProgress('prog-' + unique, 40, 4, 'white');
-			var progHitbox = new CircularProgress('prog-hitbox-' + unique, 40, 20, 'red', {opacity: 0}, true, handleProgUpdate);
+			var progHitbox = new CircularProgress('prog-hitbox-' + unique, 40, 20, 'red', {opacity: 0}, true, false, handleHitboxMove);
+			
+			progHitbox.setProgress(99.99, 0);
 			
 			// Hook up playback control events
 			$play_btn.click(aPlay);
@@ -60,7 +63,7 @@
 			//updateBuffer();
 			
 			var fadeTimer; 
-			$(progHitbox.el).hover(function() {
+			$(progHitbox.progressBar.node).hover(function() {
 				// Delay fadeIn so time read-out only shows when intended and not when they mouse simply passes over it to reach play/pause.
 				fadeTimer = setTimeout(function() {
 					$timer.fadeIn(100);
@@ -99,7 +102,7 @@
 				var timeLeft 	= $video[0].duration - $video[0].currentTime,
 					prog		= ($video[0].currentTime / $video[0].duration) * 100;
 				
-				if (!progHitbox.isScrubbing) progHitbox.setProgress(prog, 100);
+				if (!progHitbox.isScrubbing) playbackProg.setProgress(prog, 100);
 				
 				$timer.find('time').text(formatTime(timeLeft));							
 			}
@@ -123,8 +126,8 @@
 				console.log('updateBuffer: ' + percentBuffered);
 			} */
 			
-			function handleProgUpdate(prog) {
-				if (progHitbox.isScrubbing && prog < 100) {
+			function handleHitboxMove(prog) {
+				if (prog < 100) {
 					$video[0].currentTime = $video[0].duration * (prog / 100);
 				}
 				playbackProg.setProgress(prog);

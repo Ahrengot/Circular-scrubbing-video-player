@@ -1,4 +1,5 @@
-window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor, customStyles, enableDragging, newProgressCallback) {
+// TODO: Wow we're getting a lot of arguments passed in by now. Should probably do something like jQuery's settings.extend functionality instead.
+window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor, customStyles, enableDragging, autoUpdate, moveCallback, newProgressCallback) {
 	// Internal properties
 	var self 				= this,
 		radius 				= radius,
@@ -9,8 +10,7 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		paper 				= Raphael(containerEl, w, h),
 		paperCenterX		= 0,
 		paperCenterY		= 0,
-		$container			= $('#' + containerEl),
-		progressBar;
+		$container			= $('#' + containerEl);
 	
 	// Custom Attribute
 	paper.customAttributes.arc = function (value, total, radius) {
@@ -35,16 +35,14 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 	}
 	
 	function drawProgBar() {
-		progressBar = paper.path().attr({stroke: strokeColor, "stroke-width": strokeWidth, arc: [0, 100, radius]})
+		self.progressBar = paper.path().attr({stroke: strokeColor, "stroke-width": strokeWidth, arc: [0, 100, radius]})
 		if (enableDragging) {
-			progressBar.attr({cursor: 'pointer'}).drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
+			self.progressBar.attr({cursor: 'pointer'}).drag(handleProgBarMove, handleProgBarDown, handleProgBarUp);
 		}
 		
 		if (customStyles) {
-			progressBar.attr(customStyles);
+			self.progressBar.attr(customStyles);
 		}
-		
-		self.el = progressBar.node;
 	}
 	
 	// Event Handlers
@@ -64,7 +62,8 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		// Convert 0-360° value to 0-100% value.
 		var perc = Math.round((angle / 360) * 100);
 		
-		self.setProgress(perc, 100);
+		if (moveCallback) moveCallback(perc);
+		if (autoUpdate) setProgress(perc, 100);
 	}
 	
 	function handleProgBarDown() { self.isScrubbing = true; $(window).resize(); }
@@ -100,9 +99,9 @@ window.CircularProgress = function(containerEl, radius, strokeWidth, strokeColor
 		
 		if (self.progress != self.lastProgress) {
 			if (duration == 0) {
-				progressBar.attr({arc: [self.progress, 100, radius]});
+				self.progressBar.attr({arc: [self.progress, 100, radius]});
 			} else {
-				progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
+				self.progressBar.animate({arc: [self.progress, 100, radius]}, duration, ease);
 			}
 			self.lastProgress = self.progress;
 		}
