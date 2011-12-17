@@ -1,11 +1,14 @@
 // Based on this tutorial: http://dev.opera.com/articles/view/custom-html5-video-player-with-css3-and-jquery/#sec5
 (function($) {
 	$.fn.aPlayer = function(options) {
-		var defaults = {
-			theme: 'ahrengot'
+		var defaultOptions = {
+			theme: 				'ahrengot',
+			showTitle:			true,
+			muteButton:			true,
+			fullscreenButton: 	true	
 		}
 		
-		var options = $.extend(defaults, options);
+		var options = $.extend(defaultOptions, options);
 		
 		// iterate each matched <video> element
 		return this.each(function() {
@@ -13,23 +16,24 @@
 				unique = Math.round(Math.random()*(+new Date)).toString();
 			
 			//main wrapper
-			var $video_wrap = $('<div class="a-video-player paused ended"></div>').addClass(options.theme);
+			var wrapHTML = '<div class="a-video-player paused ended"></div>';
 			
 			//controls wraper
-			var html = '<div class="controls">';
-			html += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
-			html += '<div class="progress">';
-			html += '<div class="playback-prog" id="prog-' + unique + '"></div>';
-			html += '<div class="prog-hitbox" id="prog-hitbox-' + unique + '"></div>';
-			html += '</div>';
-			html += '<div class="timer"><time>00:00</time><p>Remaining</p></div>';
-			html += '<div class="mute-unmute"></div>';
-			html += '<div class="fullscreen"></div>';
-			html += '</div>';
-			
-			var $video_controls = $(html);						
+			var controlsHTML = '<div class="controls">';
+			controlsHTML += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
+			controlsHTML += '<div class="progress">';
+			controlsHTML += '<div class="playback-prog" id="prog-' + unique + '"></div>';
+			controlsHTML += '<div class="prog-hitbox" id="prog-hitbox-' + unique + '"></div>';
+			controlsHTML += '</div>';
+			controlsHTML += '<div class="timer"><time>00:00</time><p>Remaining</p></div>';
+			controlsHTML += '<div class="mute-unmute"></div>';
+			controlsHTML += '<div class="fullscreen"></div>';
+			controlsHTML += '</div>';
 			
 			// Wrap our video player in dynamically generated markup and remove default controls
+			var $video_wrap = $(wrapHTML).addClass(options.theme);
+			var $video_controls = $(controlsHTML);
+			
 			$video.wrap($video_wrap);
 			$video.after($video_controls);
 			$video.removeAttr('controls');
@@ -42,9 +46,21 @@
 			var $timer = $('.timer', $container);
 			var $mute_btn = $('.mute-unmute', $container);
 			var $fullscreen_btn = $('.fullscreen', $container);
-			// TODO: Draw mute and fullscreen buttons with SVG so we don't need any images.
 			
-			$controls.fadeOut(0);
+			// Title bar
+			var titlebarHTML = '<header class="titlebar"><p class="title"></p><p class="duration"><time>00:00</time></p></header>';
+			var $titlebar = $(titlebarHTML);
+			
+			if (options.showTitle) $video.before($titlebar);
+			
+			var $video_title = $('.title', $titlebar);
+			var $titlebar_time = $('time', $titlebar);
+			
+			$video_title[0].innerHTML = '<strong>' + $video.attr('title') + '</strong>';
+			
+			// Fade out controls and titlebar for now. We'll show them again when the video is ready.
+			$video_controls.fadeOut(0);
+			$titlebar.css('top', $titlebar.height() * -1);
 			
 			// Progress bars – The larger stroke of progHitbox makes mouse-interaction easier.
 			var playbackProg = new CircularProgress('prog-' + unique, 40, 4, 'white');
@@ -75,6 +91,7 @@
 				$timer.fadeOut(200);
 			});
 			
+			// TODO: Automatically fade away controls when the video is playing and the mouse is idle.
 			
 			// Handle media events
 			function handleVideoState(e) {
@@ -83,17 +100,20 @@
 						console.log('play event fired');
 						$play_btn.removeClass('paused');
 						$container.removeClass('paused ended');
+						$titlebar.animate({'top': $titlebar.height() * -1}, 350);
 						break;
 					case 'pause':
 						console.log('pause event fired');
 						$play_btn.addClass('paused');
 						$container.addClass('paused');
+						$titlebar.animate({'top': 0}, 500);
 						break;
 					case 'ended':
 						console.log('ended event fired');
 						$play_btn.addClass('paused');
 						$container.addClass('paused ended');
 						playbackProg.setProgress(0, 0);
+						$titlebar.animate({'top': 0}, 500);
 						break;
 				}
 			}
@@ -143,7 +163,9 @@
 				if($video[0].readyState > 0) {
 					var duration = $video[0].duration;
 					$timer.find('time').text(formatTime(duration));
-					$video_controls.fadeIn(350);			
+					$titlebar_time.text(formatTime(duration));
+					$video_controls.fadeIn(10);
+					$titlebar.css({'top': 0});			
 				} else {
 					setTimeout(arguments.callee, 150);
 				}

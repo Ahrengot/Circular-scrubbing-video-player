@@ -1,5 +1,35 @@
-.a-video-player { position: relative; }
+.a-video-player { position: relative; overflow: hidden; }
 
+/* Titlebar (toggled on/off wia the plugin options) */
+.a-video-player .titlebar {
+	position: absolute;
+	height: 41px; width: 100%;
+	overflow: hidden;
+	
+	background: #111;
+	background: -moz-linear-gradient(top,  rgba(20,20,20,0.95) 0%, rgba(0,0,0,0.9) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(20,20,20,0.95)), color-stop(100%,rgba(0,0,0,0.9)));
+	background: -webkit-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: -o-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: -ms-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2141414', endColorstr='#e6000000',GradientType=0 );
+}
+
+.a-video-player .titlebar .title,
+.a-video-player .titlebar .duration {
+	position: absolute;
+	margin-top: 0.7em;
+	font-size: 15px;
+	color: #e2e1e1;
+	text-shadow: 0 -1px 2px rgba(0,0,0,0.2);
+}
+
+.a-video-player .titlebar .title { left: 10px; }
+
+.a-video-player .titlebar .duration { right: 10px; }
+
+/* Controls wrapper – Contains all buttons, progress bars, time readouts etc */
 .a-video-player .controls { 
 	position: absolute; 
 	top: 50%; left: 50%;
@@ -20,16 +50,13 @@
 
 .a-video-player.ended .controls { width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 74px; }
 
-/* When the player is in the paused state don't fade away the controls or the video player looks like an image */
+/* When the player is in the paused state don't fade away the controls or the video player just looks like an image */
 .a-video-player.paused .controls, .a-video-player:hover .controls { opacity: 1; }
 
 /* Hide everything but the play button when the video player is in its 'ended' state */
 .a-video-player.ended .controls *:not(.play-pause) { display: none; }
 
-/* When the user hovers over the progress bar switch out the play/pause button with the time readout */
-.a-video-player .controls .progress:hover { /* Add styles */ }
-
-/* Basic styles for all buttons */
+/* Button styles */
 .a-video-player .play-pause {
 	display: block;
 	float: left;
@@ -47,7 +74,6 @@
 	transition: opacity 0.15s ease-out; 
 }
 
-/* Individual button styles */
 .a-video-player .play-pause { 
 	position: absolute;
 	top: 50%; left: 50%;
@@ -68,6 +94,7 @@
 
 .a-video-player .play-pause:hover, .a-video-player .mute-unmute:hover { opacity: 1; }
 
+/* Circular progress bar styles */
 .a-video-player .progress { 
 	position: relative; 
 	z-index: 9997; 
@@ -102,8 +129,7 @@
 
 .a-video-player .prog-hitbox { margin: -8px 0 0 -8px; z-index: 9999; }
 
-.a-video-player .volume-box {	}
-
+/* Time read-out styles */
 .a-video-player .timer { 
 	display: block; 
 	position: absolute;
