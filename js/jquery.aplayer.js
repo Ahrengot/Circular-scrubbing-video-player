@@ -165,7 +165,10 @@
 					$timer.find('time').text(formatTime(duration));
 					$titlebar_time.text(formatTime(duration));
 					$video_controls.fadeIn(10);
-					$titlebar.css({'top': 0});			
+					$titlebar.css({'top': 0});
+					
+					// Fix autoplay bug
+					if ($video[0].autoplay) $video.trigger('play');		
 				} else {
 					setTimeout(arguments.callee, 150);
 				}
