@@ -3,31 +3,34 @@
 /* Titlebar (toggled on/off wia the plugin options) */
 .a-video-player .titlebar {
 	position: absolute;
-	height: 41px; width: 100%;
+	height: 43px; width: 100%;
+	margin-top: -2px;
 	overflow: hidden;
 	
 	background: #111;
-	background: -moz-linear-gradient(top,  rgba(20,20,20,0.95) 0%, rgba(0,0,0,0.9) 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(20,20,20,0.95)), color-stop(100%,rgba(0,0,0,0.9)));
-	background: -webkit-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
-	background: -o-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
-	background: -ms-linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
-	background: linear-gradient(top,  rgba(20,20,20,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: -moz-linear-gradient(top,  rgba(30,30,30,0.95) 0%, rgba(0,0,0,0.9) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(30,30,30,0.95)), color-stop(100%,rgba(0,0,0,0.9)));
+	background: -webkit-linear-gradient(top,  rgba(30,30,30,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: -o-linear-gradient(top,  rgba(30,30,30,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: -ms-linear-gradient(top,  rgba(30,30,30,0.95) 0%,rgba(0,0,0,0.9) 100%);
+	background: linear-gradient(top,  rgba(30,30,30,0.95) 0%,rgba(0,0,0,0.9) 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2141414', endColorstr='#e6000000',GradientType=0 );
+	
+	box-shadow: 0 0 2px 0 rgba(0,0,0,1);
 }
 
 .a-video-player .titlebar .title,
 .a-video-player .titlebar .duration {
 	position: absolute;
-	margin-top: 0.7em;
+	margin-top: 0.9em;
 	font-size: 15px;
 	color: #e2e1e1;
 	text-shadow: 0 -1px 2px rgba(0,0,0,0.2);
 }
 
-.a-video-player .titlebar .title { left: 10px; }
+.a-video-player .titlebar .title { left: 16px; }
 
-.a-video-player .titlebar .duration { right: 10px; }
+.a-video-player .titlebar .duration { right: 16px; }
 
 /* Controls wrapper – Contains all buttons, progress bars, time readouts etc */
 .a-video-player .controls { 
@@ -58,14 +61,19 @@
 
 /* Button styles */
 .a-video-player .play-pause {
-	display: block;
-	float: left;
-	cursor: pointer;
-	z-index: 9998;
+	position: absolute;
+	top: 50%; left: 50%;
+	width: 30px; height: 36px;
+	margin: -18px 0 0 -15px;
 	
-	width: 30px; height: 20px;
-	background: rgba(255, 128, 128, 0.85);
+	background: url('../img/controls.png') no-repeat -95px -1px;
+	opacity: 0.8;
+
 	text-indent: -9999px;
+	
+	cursor: pointer;
+	
+	z-index: 9998;
 	
 	-moz-transition: opacity 0.15s ease-out;
     -ms-transition: opacity 0.15s ease-out;
@@ -75,24 +83,15 @@
 }
 
 .a-video-player .play-pause { 
-	position: absolute;
-	top: 50%; left: 50%;
-	width: 31px; height: 39px;
-	margin: -19px 0 0 -15px;
-	
-	background: url('../img/controls.png') no-repeat -38px 0;
-	opacity: 0.8;
-}
+	}
 
 .a-video-player .play-pause.paused { 
-	background-position: 0 0; 
-	width: 30px; height: 39px; 
+	background-position: -59px -1px; 
+	width: 31px; height: 39px; 
 	margin-left: -12px; 
 }
 
-.a-video-player .mute-unmute { opacity: 0.8; display: none; /* Implement this later */ }
-
-.a-video-player .play-pause:hover, .a-video-player .mute-unmute:hover { opacity: 1; }
+.a-video-player .play-pause:hover { opacity: 1; }
 
 /* Circular progress bar styles */
 .a-video-player .progress { 
@@ -129,6 +128,9 @@
 
 .a-video-player .prog-hitbox { margin: -8px 0 0 -8px; z-index: 9999; }
 
+.a-video-player .mute { opacity: 0.8; background: blue; content: "mute"; }
+.a-video-player .fullscreen { opacity: 0.8; background: red; content: "fullscreen"; }
+
 /* Time read-out styles */
 .a-video-player .timer { 
 	display: block; 
@@ -154,3 +156,48 @@
 	text-align: center;
 	margin-bottom: 0;
 }
+
+/* Secondary controls */
+.a-video-player .secondary-controls {
+	position: absolute;
+	top: 10px; right: 10px;
+	cursor: pointer;
+	
+	opacity: 0;
+	
+	-moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+	-webkit-transition: all 0.3s ease-out;
+	transition: all 0.3s ease-out;
+}
+
+.a-video-player:hover .secondary-controls { opacity: 1; }
+
+.a-video-player.ended .secondary-controls { opacity: 0; }
+
+.a-video-player .mute,
+.a-video-player .fullscreen {
+	width: 25px; height: 25px;
+	float: left;
+	margin-left: 10px;
+	background: url(../img/controls.png) no-repeat;
+}
+
+.a-video-player .mute { background-position: -29px 0; }
+
+.a-video-player .mute.toggled { background-position: -29px -29px; }
+
+.a-video-player .fullscreen { background-position: 0 0; }
+
+.a-video-player .fullscreen.toggled { background-position: 0 -29px; }
+
+/* Full screen styles */
+.a-video-player:fullscreen,
+.a-video-player:-moz-full-screen,
+.a-video-player:-ms-full-screen,
+.a-video-player:-o-full-screen,
+.a-video-player:-webkit-full-screen {
+	
+}
+

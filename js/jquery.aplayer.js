@@ -12,11 +12,15 @@
 		
 		// iterate each matched <video> element
 		return this.each(function() {
-			var $video = $(this),
-				unique = Math.round(Math.random()*(+new Date)).toString();
+			var $video 	= $(this),
+				videoW	= $video[0].width,
+				videoH	= $video[0].height,
+				unique 	= Math.round(Math.random()*(+new Date)).toString();
 			
 			//main wrapper
 			var wrapHTML = '<div class="a-video-player paused ended"></div>';
+			var $video_wrap = $(wrapHTML).addClass(options.theme);
+			$video.wrap($video_wrap);
 			
 			//controls wraper
 			var controlsHTML = '<div class="controls">';
@@ -26,37 +30,42 @@
 			controlsHTML += '<div class="prog-hitbox" id="prog-hitbox-' + unique + '"></div>';
 			controlsHTML += '</div>';
 			controlsHTML += '<div class="timer"><time>00:00</time><p>Remaining</p></div>';
-			controlsHTML += '<div class="mute-unmute"></div>';
-			controlsHTML += '<div class="fullscreen"></div>';
 			controlsHTML += '</div>';
 			
-			// Wrap our video player in dynamically generated markup and remove default controls
-			var $video_wrap = $(wrapHTML).addClass(options.theme);
 			var $video_controls = $(controlsHTML);
 			
-			$video.wrap($video_wrap);
 			$video.after($video_controls);
 			$video.removeAttr('controls');
 			
-			// Cache video controls for later use
-			var $container = $video.parent('.a-video-player');
-			var $controls = $('.video-controls', $container);
-			var $play_btn = $('.play-pause', $container);
-			var $progress = $('#prog-' + unique, $container);
-			var $timer = $('.timer', $container);
-			var $mute_btn = $('.mute-unmute', $container);
-			var $fullscreen_btn = $('.fullscreen', $container);
+			var $container 	= $video.parent('.a-video-player'),
+				$controls 	= $('.video-controls', $container),
+				$play_btn 	= $('.play-pause', $container),
+				$progress 	= $('#prog-' + unique, $container),
+				$timer 		= $('.timer', $container);
+			
+			// Mute and Fullscreen buttons
+			var secondaryControlsHTML = '<div class="secondary-controls">';
+			if (options.fullscreenButton) secondaryControlsHTML += '<div class="fullscreen"></div>';
+			if (options.muteButton) secondaryControlsHTML += '<div class="mute"></div>';
+			secondaryControlsHTML += '</div>';
+			
+			var $secondary_controls = $(secondaryControlsHTML);
+			
+			$video.after($secondary_controls);
+			
+			var $mute_btn 		= $('.mute', $secondary_controls),
+				$fullscreen_btn = $('.fullscreen', $secondary_controls);
 			
 			// Title bar
 			var titlebarHTML = '<header class="titlebar"><p class="title"></p><p class="duration"><time>00:00</time></p></header>';
-			var $titlebar = $(titlebarHTML);
 			
-			if (options.showTitle) $video.before($titlebar);
-			
-			var $video_title = $('.title', $titlebar);
-			var $titlebar_time = $('time', $titlebar);
+			var $titlebar 		= $(titlebarHTML),
+				$video_title 	= $('.title', $titlebar),
+				$titlebar_time 	= $('time', $titlebar);
 			
 			$video_title[0].innerHTML = '<strong>' + $video.attr('title') + '</strong>';
+			
+			if (options.showTitle) $secondary_controls.after($titlebar);
 			
 			// Fade out controls and titlebar for now. We'll show them again when the video is ready.
 			$video_controls.fadeOut(0);
@@ -71,7 +80,8 @@
 			// Hook up playback control events
 			$play_btn.click(aPlay);
 			$mute_btn.click(aMute);
-			$fullscreen_btn.click(fullscreen);
+			$fullscreen_btn.click(toggleFullscreen);
+			$container.bind('fullscreenchange mozfullscreenchange webkitfullscreenchange', handleFullscreen)
 			
 			// Hook up media events
 			$video.bind('play pause ended', handleVideoState);
@@ -95,21 +105,20 @@
 			
 			// Handle media events
 			function handleVideoState(e) {
+				console.log(e.type + ' event fired');
+				
 				switch(e.type) {
 					case 'play':
-						console.log('play event fired');
 						$play_btn.removeClass('paused');
 						$container.removeClass('paused ended');
 						$titlebar.animate({'top': $titlebar.height() * -1}, 350);
 						break;
 					case 'pause':
-						console.log('pause event fired');
 						$play_btn.addClass('paused');
 						$container.addClass('paused');
 						$titlebar.animate({'top': 0}, 500);
 						break;
 					case 'ended':
-						console.log('ended event fired');
 						$play_btn.addClass('paused');
 						$container.addClass('paused ended');
 						playbackProg.setProgress(0, 0);
@@ -165,7 +174,7 @@
 					$timer.find('time').text(formatTime(duration));
 					$titlebar_time.text(formatTime(duration));
 					$video_controls.fadeIn(10);
-					$titlebar.css({'top': 0});
+					$titlebar.css({'top': 0}).fadeOut(0).fadeIn(250);
 					
 					// Fix autoplay bug
 					if ($video[0].autoplay) $video.trigger('play');		
@@ -176,7 +185,7 @@
 			
 			function aMute() {
 				($video[0].muted)? $video[0].muted = false : $video[0].muted = true;
-				$mute_btn.toggleClass('muted', $video[0].muted);
+				$mute_btn.toggleClass('toggled', $video[0].muted);
 			}
 			
 			// Playback helper methods
@@ -189,25 +198,47 @@
 				return minutes + ":" + seconds;
 			}
 			
-			// Other methods
+			// Fullscreen logic
+			function toggleFullscreen() {
+				var fullscreenCapable = ($container[0].requestFullScreen || $container[0].mozRequestFullScreen || $container[0].webkitRequestFullScreen);
+				var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
 			
-			function fullscreen() {
-				if ($video[0].requestFullScreen) {
-					$video[0].requestFullScreen();
-					resizePlayer('100%', '100%');
-				} else if ($video[0].mozRequestFullScreen) {
-					$video[0].mozRequestFullScreen();
-					resizePlayer('100%', '100%');
-				} else if ($video[0].webkitRequestFullScreen) {
-					$video[0].webkitRequestFullScreen();
-					resizePlayer('100%', '100%');
+				if (fullscreenCapable) {
+					if (!isFullscreen) {
+						if ($container[0].requestFullScreen) $container[0].requestFullScreen();
+						else if ($container[0].mozRequestFullScreen) $container[0].mozRequestFullScreen(); 
+						else if ($container[0].webkitRequestFullScreen) $container[0].webkitRequestFullScreen(); 
+					} else {
+						if (document.cancelFullScreen) document.cancelFullScreen();  
+					  	else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+						else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();  
+					}
 				} else {
-					// Browser doesn't support fullscreen...
+					// Fullscreen isn't supported
+					// TODO: Instead of showing browsehappy just fill the browser.
+					$video.trigger('pause');
+					if (confirm('Balls! Your browser doesn\'t support fullscreen. Want to head over to browsehappy.com and upgrade to a better one?')) {
+						window.open("http://browsehappy.com", "_blank");
+					}
 				}
 			}
 			
-			function resizePlayer(w, h) {
-				$video.css({'width': w, 'height': h});
+			function handleFullscreen(e) {
+				var w = screen.width;
+				var h = screen.height;
+				var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
+				
+				$fullscreen_btn.toggleClass('toggled', isFullscreen);
+				
+				if (isFullscreen) {
+					$container.css({ 'width': w, 'height': h });
+					$video[0].width = w;
+					$video[0].height = h;
+				} else {
+					$container.css({ 'width': '', 'height': '' });
+					$video[0].width = videoW;
+					$video[0].height = videoH;
+				}
 			}
 		});	
 	}
