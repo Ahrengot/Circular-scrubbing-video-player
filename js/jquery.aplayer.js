@@ -147,6 +147,7 @@
 			
 			function stopFadeTimer() {
 				clearTimeout(controlsFadeTimer);
+				$container.unbind('mousemove');
 				$container.removeClass('fadecontrols');
 			}
 			
