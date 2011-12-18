@@ -77,11 +77,15 @@
 			
 			progHitbox.setProgress(99.99, 0);
 			
+			// TODO: Implement timeline click: scrub to clicked position
+			
 			// Hook up playback control events
 			$play_btn.click(aPlay);
-			$mute_btn.click(aMute);
-			$fullscreen_btn.click(toggleFullscreen);
-			$container.bind('fullscreenchange mozfullscreenchange webkitfullscreenchange', handleFullscreen)
+			if (options.muteButton) $mute_btn.click(aMute);
+			if (options.fullscreenButton) {
+				$fullscreen_btn.click(toggleFullscreen);
+				$container.bind('fullscreenchange mozfullscreenchange webkitfullscreenchange', handleFullscreen)
+			}
 			
 			// Hook up media events
 			$video.bind('play pause ended', handleVideoState);
@@ -105,8 +109,6 @@
 			
 			// Handle media events
 			function handleVideoState(e) {
-				console.log(e.type + ' event fired');
-				
 				switch(e.type) {
 					case 'play':
 						$play_btn.removeClass('paused');
