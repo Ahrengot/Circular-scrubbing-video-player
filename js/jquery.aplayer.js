@@ -12,9 +12,11 @@
 		
 		// iterate each matched <video> element
 		return this.each(function() {
-			var $video 	= $(this),
-				videoW	= $video[0].width,
-				videoH	= $video[0].height,
+			var $video 				= $(this),
+				videoW				= $video[0].width,
+				videoH				= $video[0].height,
+				playPauseFadeTimer	= null,
+				controlsFadeTimer	= null,
 				unique 	= Math.round(Math.random()*(+new Date)).toString();
 			
 			//main wrapper
@@ -92,20 +94,17 @@
 			$video.bind('timeupdate', updateProg);
 			//updateBuffer();
 			
-			var fadeTimer; 
 			$(progHitbox.progressBar.node).hover(function() {
 				// Delay fadeIn so time read-out only shows when intended and not when they mouse simply passes over it to reach play/pause.
-				fadeTimer = setTimeout(function() {
+				playPauseFadeTimer = setTimeout(function() {
 					$timer.fadeIn(100);
 					$play_btn.fadeOut(200);
 				}, 200);
 			}, function() {
-				clearTimeout(fadeTimer);
+				clearTimeout(playPauseFadeTimer);
 				$play_btn.fadeIn(100);
 				$timer.fadeOut(200);
 			});
-			
-			// TODO: Automatically fade away controls when the video is playing and the mouse is idle.
 			
 			// Handle media events
 			function handleVideoState(e) {
@@ -114,19 +113,41 @@
 						$play_btn.removeClass('paused');
 						$container.removeClass('paused ended');
 						$titlebar.animate({'top': $titlebar.height() * -1}, 350);
+						startFadeTimer();
 						break;
 					case 'pause':
 						$play_btn.addClass('paused');
 						$container.addClass('paused');
 						$titlebar.animate({'top': 0}, 500);
+						stopFadeTimer();
 						break;
 					case 'ended':
 						$play_btn.addClass('paused');
 						$container.addClass('paused ended');
 						playbackProg.setProgress(0, 0);
 						$titlebar.animate({'top': 0}, 500);
+						stopFadeTimer();
 						break;
 				}
+			}
+			
+			function startFadeTimer() {
+				$container.mousemove(function() {
+					$container.removeClass('fadecontrols');
+					clearTimeout(controlsFadeTimer);
+					controlsFadeTimer = setTimeout(function() {
+						$container.addClass('fadecontrols');
+					}, 1500);
+				});
+				
+				controlsFadeTimer = setTimeout(function() {
+					$container.addClass('fadecontrols');
+				}, 1500);
+			}
+			
+			function stopFadeTimer() {
+				clearTimeout(controlsFadeTimer);
+				$container.removeClass('fadecontrols');
 			}
 			
 			function updateProg() {

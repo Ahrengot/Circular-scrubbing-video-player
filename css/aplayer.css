@@ -1,4 +1,4 @@
-.a-video-player { position: relative; overflow: hidden; }
+.a-video-player { position: relative; overflow: hidden; background: black; }
 
 /* Titlebar (toggled on/off wia the plugin options) */
 .a-video-player .titlebar {
@@ -55,6 +55,8 @@
 
 /* When the player is in the paused state don't fade away the controls or the video player just looks like an image */
 .a-video-player.paused .controls, .a-video-player:hover .controls { opacity: 1; }
+
+.a-video-player.fadecontrols .controls { opacity: 0; }
 
 /* Hide everything but the play button when the video player is in its 'ended' state */
 .a-video-player.ended .controls *:not(.play-pause) { display: none; }
@@ -174,7 +176,8 @@
 
 .a-video-player:hover .secondary-controls { opacity: 1; }
 
-.a-video-player.ended .secondary-controls { opacity: 0; }
+.a-video-player.ended .secondary-controls,
+.a-video-player.fadecontrols .secondary-controls { opacity: 0; }
 
 .a-video-player .mute,
 .a-video-player .fullscreen {
@@ -191,13 +194,4 @@
 .a-video-player .fullscreen { background-position: 0 0; }
 
 .a-video-player .fullscreen.toggled { background-position: 0 -29px; }
-
-/* Full screen styles */
-.a-video-player:fullscreen,
-.a-video-player:-moz-full-screen,
-.a-video-player:-ms-full-screen,
-.a-video-player:-o-full-screen,
-.a-video-player:-webkit-full-screen {
-	
-}
 
