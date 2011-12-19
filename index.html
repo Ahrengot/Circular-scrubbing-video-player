@@ -21,8 +21,8 @@
 		</header>
 		
 		<div id="main" role="main">
-			<video id="bunny" poster="assets/video/bunny-poster.jpg" width="600" height="360" title="Big Buck Bunny – An open source movie project" >
-				<source src="assets/video/bunny-iphone.mp4" type="video/mp4" />
+			<video id="bunny" poster="assets/video/bunny-poster.jpg" width="600" height="360" title="Big Buck Bunny – An open source movie project">
+				<source src="assets/video/bunny-iphone.m4v" type="video/mp4" />
 				<source src="assets/video/bunny.mp4" type="video/mp4" />
 				<source src="assets/video/bunny.webm" type="video/webm" />
 				<source src="assets/video/bunny.ogv" type="video/ogg" />
@@ -40,11 +40,10 @@
 	<script>window.jQuery || document.write("<script src='js/libs/jquery-1.7.1.min.js'>\x3C/script>")</script>
 	<script src="js/libs/raphael-min.js"></script>
     <script src="js/circularprogress.js"></script>
-	<script src="js/jquery.aplayer.js"></script>
+	<script src="js/jquery.aplayer.js?cachebust=6"></script>
 	
 	<script type="text/javascript">
-  	
-		$(function() {
+  		$(function() {
 			$('#bunny').aPlayer({theme: 'ahrengot' });
 		});
 		
