@@ -22,8 +22,6 @@
 			}
 		}
 		
-		isMobile = true; // Debug
-		
 		// iterate each matched <video> element
 		return this.each(function() {
 			var $video 				= $(this),
