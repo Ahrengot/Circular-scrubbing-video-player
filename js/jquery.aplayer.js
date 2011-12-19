@@ -34,12 +34,11 @@
 				unique 	= Math.round(Math.random()*(+new Date)).toString();
 			
 			//main wrapper
-			var wrapHTML = '<div class="a-video-player paused ended"></div>';
-			var $video_wrap = $(wrapHTML).addClass(options.theme);
-			if (isMobile) $video_wrap.addClass('mobile');
-			$video.wrap($video_wrap);
-			
 			if (!isMobile) {
+				var wrapHTML = '<div class="a-video-player paused ended"></div>';
+				var $video_wrap = $(wrapHTML).addClass(options.theme);
+				$video.wrap($video_wrap);
+				
 				//controls wraper
 				var controlsHTML = '<div class="controls">';
 				controlsHTML += '<a class="play-pause paused" title="Play/Pause">Play/Pause</a>';
@@ -287,11 +286,38 @@
 					}
 				}
 			} else {
+				// On mobile we always want default media controls
 				$video.attr('controls', 'controls');
 				
 				// On mobile, only thing we want to show is the titlebar
 				if (options.showTitle) {
-					$titlebar.css({'top': 0}).fadeOut(0).fadeIn(250);
+					var $parent = $titlebar.parent();
+					var videoPos = $video.position();
+					
+					$parent.css('position', $parent.css('position'));
+					$parent.addClass('a-video-player paused ended');
+					
+					$titlebar.css({
+						'top': videoPos.top,
+						'left': videoPos.left,
+						'width': $video.width()
+					}).fadeOut(0).delay(1000).fadeIn(500);
+					$titlebar.find('.duration').remove();
+					
+					$video.bind('play pause ended', function(e) {
+						switch(e.type) {
+							case 'play':
+								$titlebar.delay(500).fadeOut(500);
+								break;
+							case 'pause':
+								$titlebar.delay(500).fadeIn(500);
+								break;
+							case 'ended':
+								$titlebar.delay(500).fadeIn(500);
+								break;
+						}
+
+					});
 				}
 			}
 		});
