@@ -234,7 +234,6 @@
 				}
 				
 				// Playback helper methods
-				
 				function formatTime(seconds){
 					// TODO: Refactor this section to make it more readable.
 					var minutes = Math.floor(seconds / 60) < 10 ? "0" + Math.floor(seconds / 60) : Math.floor(seconds / 60);
@@ -276,11 +275,11 @@
 					$fullscreen_btn.toggleClass('toggled', isFullscreen);
 					
 					if (isFullscreen) {
-						$container.css({ 'width': w, 'height': h });
+						$container.addClass('fullscreen').css({ 'width': w, 'height': h });
 						$video[0].width = w;
 						$video[0].height = h;
 					} else {
-						$container.css({ 'width': '', 'height': '' });
+						$container.removeClass('fullscreen').css({ 'width': '', 'height': '' });
 						$video[0].width = videoW;
 						$video[0].height = videoH;
 					}
