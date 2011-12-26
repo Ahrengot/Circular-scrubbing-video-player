@@ -82,6 +82,8 @@
 			
 			$video_title[0].innerHTML = '<strong>' + $video.attr('title') + '</strong>';
 			
+            if ($video.attr('title') == undefined) options.showTitle = false;
+            
 			if (options.showTitle) {
 				if (!isMobile) $secondary_controls.after($titlebar);
 				else $video.after($titlebar);
