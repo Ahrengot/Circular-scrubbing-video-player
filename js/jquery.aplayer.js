@@ -33,7 +33,7 @@
 			
 			//main wrapper
 			if (!isMobile) {
-				var wrapHTML = '<div class="a-video-player paused ended"></div>';
+				var wrapHTML = '<div class="a-video-player paused ended" style="height: ' + $video.attr('height') + 'px;"></div>';
 				var $video_wrap = $(wrapHTML).addClass(options.theme);
 				$video.wrap($video_wrap);
 				
