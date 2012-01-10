@@ -1,19 +1,19 @@
 // Based on this tutorial: http://dev.opera.com/articles/view/custom-html5-video-player-with-css3-and-jquery/#sec5
 (function($) {
-	$.fn.aPlayer = function(options) {
+	$.fn.aPlayer = function(arguments) {
 		var defaultOptions = {
-			theme: 				'ahrengot',
+			theme:				'ahrengot',
 			showTitle:			true,
 			muteButton:			true,
-			fullscreenButton: 	true	
+			fullscreenButton:	true	
 		}
 		
-		var options = $.extend(defaultOptions, options);
+		var options = $.extend(defaultOptions, arguments);
 		
 		// Detect mobile
-		var mobileUserAgents 	= ["iphone", "ipod","ipad","android"],
-			currUserAgent 		= navigator.userAgent.toLowerCase(),
-			isMobile 			= false;
+		var mobileUserAgents	= ["iphone", "ipod","ipad","android"],
+			currUserAgent		= window.navigator.userAgent.toLowerCase(),
+			isMobile			= false;
 		
 		for (var ua in mobileUserAgents) {
 			if (currUserAgent.indexOf(mobileUserAgents[ua]) != -1) {
