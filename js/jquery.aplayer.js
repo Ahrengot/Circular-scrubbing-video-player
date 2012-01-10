@@ -24,6 +24,10 @@
 		
 		// iterate each matched <video> element
 		return this.each(function() {
+			/*
+			 * DEFINE HTML AND PLAYBACK ELEMENTS
+			 */
+			
 			var $video 				= $(this),
 				videoW				= $video[0].width,
 				videoH				= $video[0].height,
@@ -90,6 +94,158 @@
 			}
 			
 			if (!isMobile) {
+				
+				/*
+				 * PLAYBACK METHODS AND EVENT HANDLERS
+				 */
+				
+				// Handle media events
+				var handleVideoState = function(e) {
+					switch(e.type) {
+						case 'play':
+							$play_btn.removeClass('paused');
+							$container.removeClass('paused ended');
+							$titlebar.animate({'top': $titlebar.height() * -1}, 350);
+							startFadeTimer();
+							break;
+						case 'pause':
+							$play_btn.addClass('paused');
+							$container.addClass('paused');
+							$titlebar.animate({'top': 0}, 500);
+							stopFadeTimer();
+							break;
+						case 'ended':
+							$play_btn.addClass('paused');
+							$container.addClass('paused ended');
+							playbackProg.setProgress(0, 0);
+							$titlebar.animate({'top': 0}, 500);
+							stopFadeTimer();
+							break;
+					}
+				}
+				
+				var startFadeTimer = function() {
+					$container.mousemove(function() {
+						$container.removeClass('fadecontrols');
+						clearTimeout(controlsFadeTimer);
+						controlsFadeTimer = setTimeout(function() {
+							$container.addClass('fadecontrols');
+						}, 1500);
+					});
+					
+					controlsFadeTimer = setTimeout(function() {
+						$container.addClass('fadecontrols');
+					}, 1500);
+				}
+				
+				var stopFadeTimer = function() {
+					clearTimeout(controlsFadeTimer);
+					$container.unbind('mousemove');
+					$container.removeClass('fadecontrols');
+				}
+				
+				var updateProg = function() {
+					var timeLeft 	= $video[0].duration - $video[0].currentTime,
+						prog		= ($video[0].currentTime / $video[0].duration) * 100;
+					
+					if (!progHitbox.isScrubbing) playbackProg.setProgress(prog, 100);
+					
+					$timer.find('time').text(formatTime(timeLeft));							
+				}
+				
+				/* function updateBuffer() {
+					var percentBuffered = 0;
+					// FF4+, Chrome, Safari6
+					if ($video[0].buffered && $video[0].buffered.length > 0 && $video[0].buffered.end && $video[0].duration) {
+						percentBuffered = $video[0].buffered.end(0) / $video[0].duration;	
+					} 
+					
+					// FF3.6, Safari5
+					else if ($video[0].bytesTotal != undefined && $video[0].bytesTotal > 0 && $video[0].bufferedBytes != undefined) {
+						percentBuffered = $video[0].bufferedBytes / $video[0].bytesTotal;
+					}
+					
+					// Fallback (probably not neccesary)
+					//else percentBuffered = 1;
+					
+					if (percentBuffered < 1) setTimeout(updateBuffer, 300);
+					console.log('updateBuffer: ' + percentBuffered);
+				} */
+				
+				var handleHitboxMove = function(prog) {
+					if (prog < 100) {
+						$video[0].currentTime = $video[0].duration * (prog / 100);
+					}
+					playbackProg.setProgress(prog);
+				}
+				
+				// Playback logic
+				var aPlay = function() {
+					($video[0].paused)? $video[0].play() : $video[0].pause();
+				}
+				
+				var aMute = function() {
+					($video[0].muted)? $video[0].muted = false : $video[0].muted = true;
+					$mute_btn.toggleClass('toggled', $video[0].muted);
+				}
+				
+				// Playback helper methods
+				var formatTime = function(seconds){
+					// TODO: Refactor this section to make it more readable.
+					var minutes = Math.floor(seconds / 60) < 10 ? "0" + Math.floor(seconds / 60) : Math.floor(seconds / 60);
+					var seconds = Math.floor(seconds - (minutes * 60)) < 10 ? "0" + Math.floor(seconds - (minutes * 60)) : Math.floor(seconds-(minutes * 60));
+					
+					return minutes + ":" + seconds;
+				}
+				
+				// Fullscreen logic
+				var toggleFullscreen = function() {
+					var fullscreenCapable = ($container[0].requestFullScreen || $container[0].mozRequestFullScreen || $container[0].webkitRequestFullScreen);
+					var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
+				
+					if (fullscreenCapable) {
+						if (!isFullscreen) {
+							if ($container[0].requestFullScreen) $container[0].requestFullScreen();
+							else if ($container[0].mozRequestFullScreen) $container[0].mozRequestFullScreen(); 
+							else if ($container[0].webkitRequestFullScreen) $container[0].webkitRequestFullScreen(); 
+						} else {
+							if (document.cancelFullScreen) document.cancelFullScreen();  
+						  	else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+							else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();  
+						}
+					} else {
+						// Fullscreen isn't supported
+						// TODO: Instead of showing browsehappy just fill the browser.
+						$video.trigger('pause');
+						if (confirm('Balls! Your browser doesn\'t support fullscreen. Want to head over to browsehappy.com and upgrade to a better one?')) {
+							window.open("http://browsehappy.com", "_blank");
+						}
+					}
+				}
+				
+				var handleFullscreen = function(e) {
+					var w = screen.width;
+					var h = screen.height;
+					var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
+					
+					$fullscreen_btn.toggleClass('toggled', isFullscreen);
+					
+					if (isFullscreen) {
+						$container.addClass('fullscreen').css({ 'width': w, 'height': h });
+						$video[0].width = w;
+						$video[0].height = h;
+					} else {
+						$container.removeClass('fullscreen').css({ 'width': '', 'height': '' });
+						$video[0].width = videoW;
+						$video[0].height = videoH;
+					}
+				}
+				
+				 
+				
+				/*
+				 * EVENT HANDLERS, PROGRESS BARS, ETC..
+				 */
 				// Fade out controls and titlebar for now. We'll show them again when the video is ready.
 				$video_controls.fadeOut(0);
 				$titlebar.css('top', $titlebar.height() * -1);
@@ -127,92 +283,8 @@
 					$timer.fadeOut(200);
 				});
 				
-				// Handle media events
-				function handleVideoState(e) {
-					switch(e.type) {
-						case 'play':
-							$play_btn.removeClass('paused');
-							$container.removeClass('paused ended');
-							$titlebar.animate({'top': $titlebar.height() * -1}, 350);
-							startFadeTimer();
-							break;
-						case 'pause':
-							$play_btn.addClass('paused');
-							$container.addClass('paused');
-							$titlebar.animate({'top': 0}, 500);
-							stopFadeTimer();
-							break;
-						case 'ended':
-							$play_btn.addClass('paused');
-							$container.addClass('paused ended');
-							playbackProg.setProgress(0, 0);
-							$titlebar.animate({'top': 0}, 500);
-							stopFadeTimer();
-							break;
-					}
-				}
 				
-				function startFadeTimer() {
-					$container.mousemove(function() {
-						$container.removeClass('fadecontrols');
-						clearTimeout(controlsFadeTimer);
-						controlsFadeTimer = setTimeout(function() {
-							$container.addClass('fadecontrols');
-						}, 1500);
-					});
-					
-					controlsFadeTimer = setTimeout(function() {
-						$container.addClass('fadecontrols');
-					}, 1500);
-				}
-				
-				function stopFadeTimer() {
-					clearTimeout(controlsFadeTimer);
-					$container.unbind('mousemove');
-					$container.removeClass('fadecontrols');
-				}
-				
-				function updateProg() {
-					var timeLeft 	= $video[0].duration - $video[0].currentTime,
-						prog		= ($video[0].currentTime / $video[0].duration) * 100;
-					
-					if (!progHitbox.isScrubbing) playbackProg.setProgress(prog, 100);
-					
-					$timer.find('time').text(formatTime(timeLeft));							
-				}
-				
-				/* function updateBuffer() {
-					var percentBuffered = 0;
-					// FF4+, Chrome, Safari6
-					if ($video[0].buffered && $video[0].buffered.length > 0 && $video[0].buffered.end && $video[0].duration) {
-						percentBuffered = $video[0].buffered.end(0) / $video[0].duration;	
-					} 
-					
-					// FF3.6, Safari5
-					else if ($video[0].bytesTotal != undefined && $video[0].bytesTotal > 0 && $video[0].bufferedBytes != undefined) {
-						percentBuffered = $video[0].bufferedBytes / $video[0].bytesTotal;
-					}
-					
-					// Fallback (probably not neccesary)
-					//else percentBuffered = 1;
-					
-					if (percentBuffered < 1) setTimeout(updateBuffer, 300);
-					console.log('updateBuffer: ' + percentBuffered);
-				} */
-				
-				function handleHitboxMove(prog) {
-					if (prog < 100) {
-						$video[0].currentTime = $video[0].duration * (prog / 100);
-					}
-					playbackProg.setProgress(prog);
-				}
-				
-				// Playback logic
-				function aPlay() {
-					($video[0].paused)? $video[0].play() : $video[0].pause();
-				}
-				
-				(function spawnControls() {
+				var spawnControls = function() {
 					// We need the video to be in the readyState before we can read it's duration.
 					if($video[0].readyState > 0) {
 						var duration = $video[0].duration;
@@ -226,64 +298,11 @@
 					} else {
 						setTimeout(arguments.callee, 150);
 					}
-				})();
-				
-				function aMute() {
-					($video[0].muted)? $video[0].muted = false : $video[0].muted = true;
-					$mute_btn.toggleClass('toggled', $video[0].muted);
 				}
 				
-				// Playback helper methods
-				function formatTime(seconds){
-					// TODO: Refactor this section to make it more readable.
-					var minutes = Math.floor(seconds / 60) < 10 ? "0" + Math.floor(seconds / 60) : Math.floor(seconds / 60);
-					var seconds = Math.floor(seconds - (minutes * 60)) < 10 ? "0" + Math.floor(seconds - (minutes * 60)) : Math.floor(seconds-(minutes * 60));
-					
-					return minutes + ":" + seconds;
-				}
+				// This starts everything… sweet!
+				spawnControls();
 				
-				// Fullscreen logic
-				function toggleFullscreen() {
-					var fullscreenCapable = ($container[0].requestFullScreen || $container[0].mozRequestFullScreen || $container[0].webkitRequestFullScreen);
-					var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
-				
-					if (fullscreenCapable) {
-						if (!isFullscreen) {
-							if ($container[0].requestFullScreen) $container[0].requestFullScreen();
-							else if ($container[0].mozRequestFullScreen) $container[0].mozRequestFullScreen(); 
-							else if ($container[0].webkitRequestFullScreen) $container[0].webkitRequestFullScreen(); 
-						} else {
-							if (document.cancelFullScreen) document.cancelFullScreen();  
-						  	else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-							else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();  
-						}
-					} else {
-						// Fullscreen isn't supported
-						// TODO: Instead of showing browsehappy just fill the browser.
-						$video.trigger('pause');
-						if (confirm('Balls! Your browser doesn\'t support fullscreen. Want to head over to browsehappy.com and upgrade to a better one?')) {
-							window.open("http://browsehappy.com", "_blank");
-						}
-					}
-				}
-				
-				function handleFullscreen(e) {
-					var w = screen.width;
-					var h = screen.height;
-					var isFullscreen = document.mozFullScreen || document.webkitIsFullScreen || document.fullScreen;
-					
-					$fullscreen_btn.toggleClass('toggled', isFullscreen);
-					
-					if (isFullscreen) {
-						$container.addClass('fullscreen').css({ 'width': w, 'height': h });
-						$video[0].width = w;
-						$video[0].height = h;
-					} else {
-						$container.removeClass('fullscreen').css({ 'width': '', 'height': '' });
-						$video[0].width = videoW;
-						$video[0].height = videoH;
-					}
-				}
 			} else {
 				// On mobile we always want default media controls
 				$video.attr('controls', 'controls');
