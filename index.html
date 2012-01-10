@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	
 	
-	<title>Circular Scrubbing Video Player</title>
+	<title>Circular UI Video Player</title>
 	
 	<script src="js/modernizr.custom.min.js"></script>
 	
@@ -18,20 +18,21 @@
 	<div id="container">
 		
 		<header>
-			<h1>Video Player with circular progress</h1>
+			<h1>Video Player with circular user interface</h1>
 		</header>
 		
 		<div id="main" role="main">
-			<video id="bunny" poster="assets/video/poster.jpg" width="600" height="349" title="Skive Festival 2010 - Website demo">
+			<video id="bunny" poster="assets/video/posterframe.jpg" width="600" height="349" title="Skive Festival 2010 - Website demo">
+				<source src="assets/video/video.mp4" type="video/mp4" />
 				<source src="assets/video/video.webm" type="video/webm" />
 				<source src="assets/video/video.ogv" type="video/ogg" />
-                <source src="assets/video/video.mp4" type="video/mp4" />
-                <source src="assets/video/video-iphone.m4v" type="video/mp4" />
+               	<source src="assets/video/video-iphone.m4v" type="video/mp4" />
 			</video>
 		</div>
 
 		<footer>
-			<small>Made by <a href="http://ahrengot.com/" title="Digital art director" rel="author">Jens Ahrengot Boddum</a>. Based on my old <a href="http://activeden.net/item/video-player-with-circular-scrubbingprogress/130624" rel="no-follow" title="Flash video player with circular scrubbing">Flash video player</a>. The video demonstrates a website i build a few years back</small>
+			<p><small>Made by <a href="http://ahrengot.com/" title="Digital art director" rel="author">Jens Ahrengot Boddum</a>. Based on my old <a href="http://activeden.net/item/video-player-with-circular-scrubbingprogress/130624" rel="no-follow" title="Flash video player with circular scrubbing">Flash video player</a>.</small></p>
+			<p><small><em>The video demonstrates a festival website i created a few years back</em></small></p>
 		</footer>
 		
 	</div> <!-- eo #container -->
@@ -41,7 +42,7 @@
 	<script>window.jQuery || document.write("<script src='js/libs/jquery-1.7.1.min.js'>\x3C/script>")</script>
 	<script src="js/libs/raphael-min.js"></script>
     <script src="js/circularprogress.js"></script>
-	<script src="js/jquery.aplayer.js></script>
+	<script src="js/jquery.aplayer.js"></script>
 	
 	<script type="text/javascript">
   		$(function() {
